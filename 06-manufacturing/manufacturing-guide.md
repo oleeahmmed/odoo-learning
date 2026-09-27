@@ -1,440 +1,406 @@
-# পার্ট ০৬ — Manufacturing
-### ঢাকা গার্মেন্টস — পোশাক কারখানা
+# Manufacturing — সহজ গল্পে সম্পূর্ণ সেটআপ
+### রহিম ট্রেডার্স: scratch থেকে Login → কাঁচামাল → BOM → তৈরি → স্টক
 
 ---
 
-## Business পরিচয়
+## গল্প: অফিসে কে কে?
 
-**ঢাকা গার্মেন্টস** একটা ছোট পোশাক কারখানা।
+| কে | ভূমিকা | Odoo তে কী করে |
+|---|---|---|
+| **রহিম ভাই** | মালিক | Apps, Settings, BOM সেট করে |
+| **রফিক** | প্রোডাকশন কর্মী | Manufacturing Order চালায়, Produce করে |
+| **জাবেদ** | স্টোরকিপার | কাঁচামাল Receipt, তৈরি মাল On Hand চেক |
+| **ঢাকা ইলেকট্রনিক্স** | Vendor | কাঁচামাল কেনা |
+| **সানরাইজ স্টোর** | Customer | পরে তৈরি পণ্য বিক্রি (Sales) |
+
+রহিম ভাই শুধু চার্জার কেনা-বেচা নন — এখন **ছোট অ্যাসেম্বলি** করেন:
 
 ```
-মালিক:    শফিক সাহেব
-ব্যবসা:   কাপড় কিনে নিজেরা শার্ট তৈরি করেন
-সমস্যা:   একটা শার্ট বানাতে কত কাপড় লাগে, কত সুতা লাগে
-          কোনো record নেই
-          কতটা তৈরি হয়েছে, কতটা stock-এ আছে
-          হিসাব নেই
-          কোনো order আসলে কতটা বানাতে পারবেন বুঝতে পারেন না
+কাঁচামাল:  USB Cable 1m  +  Plastic Case
+তৈরি পণ্য: Charger Combo Pack
+```
+
+একটা Combo Pack বানাতে লাগে: কেবল ১টা + কেস ১টা।
+
+আপনি প্রথমে **রহিম (Admin)** হয়ে সেটআপ করবেন।  
+পরে **রফিক** রোজ Manufacturing Order চালাবে।
+
+```
+Demo data ☐ OFF — সব হাতে বানাব
+অ্যাপ = Manufacturing + Inventory (+ Contacts)
+আগে Contacts/Inventory জানা থাকলে একই DB চলতে পারে
+অথবা নতুন DB: rahim_manufacturing
 ```
 
 ---
 
-## ধাপ ১ — Fresh Database তৈরি করুন
+## সোনার নিয়ম
+
+```
+১  কাঁচামাল Product আগে → স্টক আগে (Receipt)
+২  তৈরি পণ্য Product আগে → তারপর BOM
+৩  BOM ছাড়া Manufacturing Order পূর্ণ হয় না
+৪  কাঁচামাল স্টক না থাকলে Produce আটকে যায়
+৫  Produce Done = কাঁচামাল কমে + তৈরি পণ্য বাড়ে
+```
+
+---
+
+# দিন ১ সকাল — খাতা খোলা (রহিম)
+
+## ১) Database
+
+নতুন করে শিখতে:
 
 ```
 http://localhost:8069/web/database/manager
-
-Master Password:  admin
-Database Name:    dhaka_garments
-Email:            admin@dhaka.com
-Password:         admin123
-Language:         English
-Country:          Bangladesh
-Demo data:        ☑ ON
 ```
 
-→ **Create Database** → Login করুন।
+| Field | মান |
+|---|---|
+| Database Name | `rahim_manufacturing` |
+| Email | `admin@rahim.com` |
+| Password | `admin123` |
+| Country | Bangladesh |
+| Demo data | ☐ খালি |
 
-### Company ও Timezone সেট করুন
+Create → Login
 
-Settings → Companies → company নামে click:
+(আগের `rahim_traders` চালাতে চাইলে সেখানেই Manufacturing Install করুন — ডেমো নাম একই রাখুন।)
+
+## ২) Company
+
 ```
-Company Name:  ঢাকা গার্মেন্টস
-Country:       Bangladesh
-Currency:      BDT
+Settings → Companies → রহিম ট্রেডার্স → Save
+Preferences → Timezone: Asia/Dhaka → Save
 ```
-Save। উপরে ডানদিকে নামে click → Preferences → `Timezone: Asia/Dhaka` → Save।
+
+রহিম: “এখন কারখানার মডিউল লাগাই।”
 
 ---
 
-## ধাপ ২ — Apps Install করুন
+# দিন ১ দুপুর — Apps ইনস্টল (রহিম)
 
 ```
-Manufacturing   → Install
-Inventory       → Install
-Purchase        → Install
+Apps → Contacts → Install
+Apps → Inventory → Install
+Apps → Manufacturing → Install
 ```
 
-Manufacturing → Configuration → Settings:
+চাইলে Purchaseও Install — কাঁচামাল Receipt সহজ হয়।
+
+উপরে **Manufacturing** মেনু এলে OK।
+
 ```
-Work Orders:    ☑ চালু করুন
+Inventory → Configuration → Settings
+☑ Storage Locations
+☑ Lots & Serial Numbers   (ঐচ্ছিক — শিখতে পরে)
+→ Save
 ```
+
+Manufacturing Settings:
+
+```
+Manufacturing → Configuration → Settings
+```
+
+শিখতে মিনিমাল রাখুন। Work Orders টিক না দিলেও সাধারণ Produce চলে।  
+(Work Orders = প্রতি ধাপ আলাদা — পরে।)
+
+→ **Save**
+
+**রফিক পরে কী দেখবে:** Manufacturing → Operations → Manufacturing Orders।
 
 ---
 
-## ধাপ ৩ — Raw Material Products তৈরি করুন
+# দিন ১ বিকেল — Contact + Warehouse চেক (রহিম)
 
+## Vendor
+
+```
+Contacts → New → Company
+Name: Dhaka Electronics Ltd → Save
+```
+
+## Location
+
+```
+Inventory → Configuration → Locations
+```
+
+Stock এর Parent = **WH** আছে কিনা দেখুন (`WH/Stock`)।  
+চাইলে Tak-1 বানান (Parent = Stock) — তৈরি মাল সেখানে রাখতে।
+
+---
+
+# দিন ২ সকাল — তিনটা পণ্য বানান (রহিম) — আগে Product, পরে BOM
+
+রহিম: “BOM এ পণ্য বাছব — আগে পণ্য না থাকলে বাছব কী?”
+
+```
 Inventory → Products → Products → New
-
-**কাপড়:**
-```
-Product Name:   White Cotton Fabric (meter)
-Product Type:   Storable Product
-Cost:           150
-Unit of Measure: m (meter)
-Purchase UoM:   m
-```
-Save।
-
-**সুতা:**
-```
-Product Name:   Sewing Thread (reel)
-Product Type:   Storable Product
-Cost:           80
-UoM:            pcs
-```
-Save।
-
-**বোতাম:**
-```
-Product Name:   Shirt Button (dozen)
-Product Type:   Storable Product
-Cost:           25
-UoM:            doz
-```
-Save।
-
----
-
-## ধাপ ৪ — Finished Product তৈরি করুন
-
-```
-Product Name:   Men's White Shirt (M)
-Product Type:   Storable Product
-Sales Price:    850
-Cost:           0    ← Odoo নিজেই হিসাব করবে BOM থেকে
-Tracking:       By Serial Number
-```
-
-Save।
-
----
-
-## ধাপ ৫ — Work Centers তৈরি করুন
-
-Work Center মানে কারখানার একটা নির্দিষ্ট কাজের জায়গা বা মেশিন।
-
-Manufacturing → Configuration → Work Centers → New
-
-```
-Name:               Cutting Section
-Capacity:           5     ← একসাথে ৫টা কাজ হতে পারে
-Time Efficiency:    100%
-Cost per Hour:      200   ← মেশিন + শ্রমিকের ঘণ্টাপ্রতি খরচ
-```
-
-New:
-```
-Name:         Sewing Section
-Capacity:     10
-Cost/Hour:    300
-```
-
-New:
-```
-Name:         Finishing Section
-Capacity:     5
-Cost/Hour:    150
-```
-
-Save সব।
-
----
-
-## ধাপ ৬ — Bill of Materials (BOM) তৈরি করুন
-
-BOM মানে একটা product তৈরির রেসিপি।
-কী কী raw material লাগবে, কতটুকু লাগবে।
-
-Manufacturing → Products → Bills of Materials → New
-
-```
-Product:   Men's White Shirt (M)
-Reference: BOM-SHIRT-001
-BOM Type:  Manufacture this Product
-Quantity:  1     ← ১টা শার্টের জন্য
-```
-
-**Components Tab:**
-
-Add a line:
-```
-Component:   White Cotton Fabric
-Quantity:    2.5 m
-```
-
-Add a line:
-```
-Component:   Sewing Thread
-Quantity:    1 pcs
-```
-
-Add a line:
-```
-Component:   Shirt Button
-Quantity:    1 doz
-```
-
-**Operations Tab** (Work Orders):
-
-Add a line:
-```
-Operation:    Cutting
-Work Center:  Cutting Section
-Duration:     10 min      ← ১টা শার্ট cut করতে ১০ মিনিট
-```
-
-Add a line:
-```
-Operation:    Sewing
-Work Center:  Sewing Section
-Duration:     25 min
-```
-
-Add a line:
-```
-Operation:    Finishing
-Work Center:  Finishing Section
-Duration:     5 min
-```
-
-Save।
-
-### pgAdmin-এ দেখুন
-
-```sql
--- BOM ও components
-SELECT
-    pt.name AS finished_product,
-    mb.product_qty AS bom_quantity,
-    cpt.name AS component,
-    mbl.product_qty AS component_qty,
-    pu.name AS uom
-FROM mrp_bom mb
-JOIN product_template pt ON mb.product_tmpl_id = pt.id
-JOIN mrp_bom_line mbl ON mbl.bom_id = mb.id
-JOIN product_product cpp ON mbl.product_id = cpp.id
-JOIN product_template cpt ON cpp.product_template_id = cpt.id
-JOIN uom_uom pu ON mbl.product_uom_id = pu.id
-ORDER BY mbl.sequence;
 ```
 
 ---
 
-## ধাপ ৭ — Raw Material Stock ঢোকান
+## পণ্য A — কাঁচামাল: USB Cable 1m
 
-Manufacturing করতে হলে আগে raw material stock-এ আনতে হবে।
+| Field | ডেমো মান |
+|---|---|
+| Name | USB Cable 1m |
+| Product Type | **Storable Product** |
+| Cost | 70 |
+| Sales Price | 120 |
+| Can be Purchased | ☑ |
+| Can be Sold | ☑ (আলাদাও বেচতে পারেন) |
 
+→ **Save**
+
+---
+
+## পণ্য B — কাঁচামাল: Plastic Case
+
+| Field | ডেমো মান |
+|---|---|
+| Name | Plastic Case |
+| Product Type | **Storable Product** |
+| Cost | 40 |
+| Can be Purchased | ☑ |
+| Can be Sold | ☐ |
+
+→ **Save**
+
+---
+
+## পণ্য C — তৈরি জিনিস: Charger Combo Pack
+
+| Field | ডেমো মান |
+|---|---|
+| Name | Charger Combo Pack |
+| Product Type | **Storable Product** |
+| Sales Price | 450 |
+| Cost | 110 (আন্দাজ) |
+| Can be Sold | ☑ |
+| Can be Purchased | ☐ |
+
+→ **Save**
+
+Inventory ট্যাবে Routes থাকলে **Manufacture** ☑ করতে হতে পারে (Settings অনুযায়ী)।  
+না দেখলে পরে BOM Save করলেও অনেক সময় চলে।
+
+```
+এখনও BOM নেই — শুধু তিনটা Product কার্ড
+স্টকও এখনো ০
+```
+
+---
+
+# দিন ২ দুপুর — কাঁচামাল স্টকে আনুন (জাবেদ)
+
+রফিক Produce করতে গেলে স্টক না থাকলে আটকে যাবে। তাই আগে মাল ঢোকান।
+
+```
 Inventory → Operations → Receipts → New
-
-```
-Operation Type: Receipts
 ```
 
-Add lines:
-```
-Product:  White Cotton Fabric    Quantity: 500 m
-Product:  Sewing Thread          Quantity: 300 pcs
-Product:  Shirt Button           Quantity: 200 doz
-```
+| Field | মান |
+|---|---|
+| Receive From | Dhaka Electronics Ltd |
 
-Validate করুন।
+দুই লাইন:
 
----
+| Product | Demand |
+|---|---|
+| USB Cable 1m | 100 |
+| Plastic Case | 100 |
 
-## ধাপ ৮ — Manufacturing Order তৈরি করুন
+→ Mark as Todo → Quantity ভরুন → **Validate**
 
-একটা order এসেছে — ৫০টা শার্ট লাগবে।
-
-Manufacturing → Manufacturing Orders → New
-
-```
-Product:          Men's White Shirt (M)
-Bill of Material: BOM-SHIRT-001   ← automatically আসবে
-Quantity:         50
-Scheduled Date:   আজকে থেকে ৩ দিন পর
-```
-
-**Confirm** চাপুন।
-
-Status: **Confirmed**
-
-এখন দেখুন **Components Tab:**
+**জাবেদ কী দেখবে:** দুটো পণ্যে On Hand ≈ 100।  
+**Charger Combo Pack** এখনো ০ — এখনো তৈরি হয়নি।
 
 ```
-Component            Required    Available
-White Cotton Fabric  125 m       500 m    ✓
-Sewing Thread        50 pcs      300 pcs  ✓
-Shirt Button         50 doz      200 doz  ✓
-```
-
-Odoo নিজেই হিসাব করেছে:
-- ৫০টা শার্ট × ২.৫ মিটার = ১২৫ মিটার কাপড় লাগবে
-
-**Work Orders Tab:**
-
-```
-Operation   Work Center      Expected Duration
-Cutting     Cutting Section  500 min (50 × 10)
-Sewing      Sewing Section   1250 min
-Finishing   Finishing Section 250 min
+Receipt আগে → তারপর Manufacturing
 ```
 
 ---
 
-## ধাপ ৯ — Work Orders Process করুন
-
-**Work Orders Tab** → **Cutting** → Start
-
-কাটা শেষ হলে → **Done**
-
-**Sewing** → Start → Done
-
-**Finishing** → Start → Done
-
----
-
-## ধাপ ১০ — Manufacturing Order Validate করুন
-
-উপরে **Validate** চাপুন।
+# দিন ২ বিকেল — BOM বানান (রহিম) — Product এর পর
 
 ```
-Serial Numbers: SHIRT-001 থেকে SHIRT-050 পর্যন্ত দিন
-(প্রতিটা শার্টের আলাদা serial number)
+Manufacturing → Products → Bills of Materials → New
 ```
 
-Validate হলে:
+অথবা: Charger Combo Pack খুলে → Bill of Materials।
+
+| Field | ডেমো মান |
+|---|---|
+| Product | **Charger Combo Pack** |
+| Quantity | 1.00 (১টা প্যাক বানাতে) |
+| BOM Type | Manufacture this product |
+
+Components ট্যাব / লাইন:
+
+| Component | Quantity |
+|---|---|
+| USB Cable 1m | 1 |
+| Plastic Case | 1 |
+
+→ **Save**
+
+**গল্প:** “১টা Combo Pack = ১ কেবল + ১ কেস।”
+
+**রফিক পরে কী দেখবে:** Manufacturing Order এ এই BOM অটো লাগবে।
 
 ```
-Raw Material (consumed):
-    White Cotton Fabric: 500 → 375  (125 মিটার খরচ হয়েছে)
-    Sewing Thread:       300 → 250  (50 পিস খরচ)
-    Shirt Button:        200 → 150  (50 ডজন খরচ)
-
-Finished Product (produced):
-    Men's White Shirt:   0 → 50    (৫০টা তৈরি হয়েছে)
-```
-
-### pgAdmin-এ দেখুন — Stock Changes
-
-```sql
-SELECT
-    pt.name AS product,
-    SUM(sq.quantity) AS current_stock,
-    sl.complete_name AS location
-FROM stock_quant sq
-JOIN product_product pp ON sq.product_id = pp.id
-JOIN product_template pt ON pp.product_template_id = pt.id
-JOIN stock_location sl ON sq.location_id = sl.id
-WHERE sl.usage = 'internal'
-GROUP BY pt.name, sl.complete_name
-ORDER BY pt.name;
-```
-
-দেখবেন raw materials কমেছে, finished goods বেড়েছে।
-
----
-
-## ধাপ ১১ — Manufacturing-এর Database Structure
-
-```sql
--- Manufacturing Order দেখুন
-SELECT
-    mo.name,
-    pt.name AS product,
-    mo.product_qty,
-    mo.state,
-    mo.date_start,
-    mo.date_finished
-FROM mrp_production mo
-JOIN product_product pp ON mo.product_id = pp.id
-JOIN product_template pt ON pp.product_template_id = pt.id
-ORDER BY mo.id DESC
-LIMIT 5;
-```
-
-```sql
--- Component consumption দেখুন
-SELECT
-    pt.name AS component,
-    sm.product_uom_qty AS planned_qty,
-    sm.quantity_done AS consumed_qty,
-    sm.state
-FROM stock_move sm
-JOIN product_product pp ON sm.product_id = pp.id
-JOIN product_template pt ON pp.product_template_id = pt.id
-JOIN mrp_production mo ON sm.production_id = mo.id
-WHERE mo.name = 'WH/MO/00001';
+BOM না বানিয়ে MO তে গেলে কম্পোনেন্ট খালি/error
+সিরিয়াল: Product → স্টক → BOM → তারপর Order
 ```
 
 ---
 
-## Manufacturing-এ Database-এ কী হয়
+# দিন ৩ — Manufacturing Order (রফিক)
+
+**গল্প:** সানরাইজকে ১০টা Combo Pack লাগবে — আগে তৈরি করি।
 
 ```
-Manufacturing Order Confirm করলে:
-    mrp_production     → নতুন row, state='confirmed'
-    stock_move         → components-এর জন্য (location: stock → production)
-    stock_move         → finished product-এর জন্য (location: production → stock)
-    mrp_workorder      → প্রতিটা work order
+Manufacturing → Operations → Manufacturing Orders → New
+```
 
-Work Order শুরু করলে:
-    mrp_workorder      → state: 'ready' → 'progress'
-    mrp_workcenter_productivity → time tracking
+| Field | ডেমো মান |
+|---|---|
+| Product | Charger Combo Pack |
+| Quantity | 10 |
 
-Validate করলে:
-    mrp_production     → state: 'done'
-    stock_move         → state: 'done' (components consumed)
-    stock_move         → state: 'done' (finished goods produced)
-    stock_quant        → raw materials কমল
-    stock_quant        → finished goods বাড়ল
-    stock_lot          → serial numbers তৈরি হলো
+BOM অটো আসবে (একটাই থাকলে)।  
+Components এ দেখাবে: Cable 10 + Case 10।
+
+→ **Confirm**
+
+স্ট্যাটাস Confirmed / Waiting ইত্যাদি।
+
+→ **Check Availability** (বাটন থাকলে)
+
+কাঁচামাল যথেষ্ট থাকলে Ready / Available।
+
+**রফিক কী দেখবে:** কোন কম্পোনেন্ট কম আছে কিনা লাল/সতর্কবার্তা।  
+কম থাকলে জাবেদকে আবার Receipt করতে বলবেন — Produce আগে নয়।
+
+---
+
+# দিন ৩ বিকেল — Produce / Mark as Done (রফিক)
+
+MO খোলা:
+
+→ **Produce** অথবা **Mark as Done** / Validate (স্ক্রিনে যে বাটন)
+
+Qty 10 ঠিক আছে কিনা দেখে Confirm।
+
+### Done এর পর কোথায় কী বদলায়
+
+| জায়গা | আগে | পরে |
+|---|---|---|
+| USB Cable On Hand | 100 | ≈ 90 |
+| Plastic Case On Hand | 100 | ≈ 90 |
+| Charger Combo Pack On Hand | 0 | ≈ **10** |
+| Manufacturing Order | In Progress | **Done** |
+
+**রহিম কী দেখবে:** Products এ Combo Pack স্টক এসেছে — এখন Sales এ বিক্রি করা যায়।
+
+```
+Produce Done = কারখানা শেষ
+কাঁচামাল কমে + তৈরি পণ্য বাড়ে
 ```
 
 ---
 
-## ধাপ ১২ — Cost Calculation
+# দিন ৪ — তৈরি পণ্য বিক্রি (ঐচ্ছিক লিংক)
 
-একটা শার্ট বানাতে আসলে কত খরচ?
-
-Manufacturing Order-এ **Cost Analysis** বা উপরের
-**→ Cost** tab দেখুন:
+স্টক আছে বলে সালমা Sales এ:
 
 ```
-Component Cost:
-    Fabric (2.5m × 150):    375
-    Thread (1 × 80):         80
-    Button (1doz × 25):      25
-    Total Materials:        480
-
-Operation Cost:
-    Cutting (10min × 200/60):   33
-    Sewing  (25min × 300/60):  125
-    Finishing(5min × 150/60):   12
-    Total Operations:          170
-
-Total Manufacturing Cost:       650
+Quotation → Customer সানরাইজ → Product Charger Combo Pack Qty 5 → Confirm → Delivery
 ```
 
-সেলস প্রাইস ৮৫০ — লাভ ২০০ টাকা প্রতি শার্টে।
+Inventory পার্টের মতো Delivery Validate।
+
+এটা Manufacturing এর পরের ধাপ — শুধু বোঝার জন্য।
 
 ---
 
-## এই Part-এ যা শিখলেন
+# দিন ৫ — রহিম রিপোর্ট / চেক
 
 ```
-✓ Bill of Materials — recipe তৈরি
-✓ Work Centers — কারখানার section
-✓ Manufacturing Order তৈরি ও confirm
-✓ Work Orders process করা
-✓ Raw material → Finished product
-✓ Stock automatically update হওয়া
-✓ Cost calculation
-✓ mrp_production, mrp_bom, stock_move — database tables
+Inventory → Reporting → Stock
+Manufacturing → Reporting (থাকলে)
+```
+
+রহিম: “কত Combo বানালাম, কাঁচামাল কত কমল — সব খাতায় আছে।”
+
+---
+
+# কে কখন কোন মেনু
+
+| মেনু | রহিম | রফিক | জাবেদ |
+|---|---|---|---|
+| Apps / Settings / BOM | ✅ একবার | — | — |
+| Products (কাঁচামাল/তৈরি) | ✅ | দেখে | On Hand |
+| Receipts | — | — | ✅ কাঁচামাল |
+| Manufacturing Orders | দেখে | ✅ Confirm + Produce | — |
+| Sales (তৈরি পণ্য) | — | — | Delivery |
+
+---
+
+# ডেমো চরিত্র ও পণ্য — এক নজরে
+
+| নাম | ধরন |
+|---|---|
+| Dhaka Electronics Ltd | Vendor |
+| USB Cable 1m | কাঁচামাল |
+| Plastic Case | কাঁচামাল |
+| Charger Combo Pack | তৈরি পণ্য |
+| BOM | 1 Pack = 1 Cable + 1 Case |
+| MO Qty | 10 |
+
+---
+
+# এক নজরে পুরো রাস্তা
+
+```
+১  DB + Company (Demo OFF)
+২  Contacts + Inventory + Manufacturing Install
+৩  Vendor লেখা
+৪  Product: Cable, Case, Combo Pack
+৫  Receipt: Cable 100 + Case 100 → Validate
+৬  BOM: Combo = Cable 1 + Case 1
+৭  MO: Combo Qty 10 → Confirm → Check Availability
+৮  Produce / Done
+৯  On Hand: Combo +10, কাঁচামাল −10 করে
+১০ (ঐচ্ছিক) Sales এ Combo বিক্রি
 ```
 
 ---
 
-## পরের পার্ট
+## সমস্যা হলে
 
-**`07-crm/crm-guide.md`** — ক্লাউড সফটওয়্যার বিডি
+| সমস্যা | কী করবেন |
+|---|---|
+| Manufacturing মেনু নেই | Apps → Install |
+| BOM এ Product খালি | আগে Product Save |
+| Components খালি | BOM এ লাইন যোগ |
+| Cannot produce / স্টক নেই | আগে Receipt দিয়ে কাঁচামাল আনুন |
+| Combo On Hand ০ অথচ Done | Product Type Storable তো? Location Internal তো? |
+| Work Orders জটিল | Settings এ Work Orders টিক খুলে সাধারণ Produce করুন |
+
+---
+
+## Accounting এর মতো মনে রাখুন
+
+```
+Accounting: Account আগে → Product এ সেট
+Manufacturing: Product + স্টক আগে → BOM → তারপর MO
+কোনো কিছু না বানিয়ে সামনের ধাপে যাবেন না
+```
+
+এই ফাইল উপর থেকে দিন ১ → ৫।  
+রহিম সেটআপ, জাবেদ কাঁচামাল, রফিক তৈরি — তাহলে Manufacturing পরিষ্কার।
