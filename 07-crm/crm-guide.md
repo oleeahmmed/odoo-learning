@@ -1,111 +1,402 @@
-# CRM — scratch থেকে সম্পূর্ণ সেটআপ
-### রহিম ট্রেডার্স: Login → Install → Settings → Configuration → Leads/Pipeline
+# CRM — ব্যবসায়ীর কাজের খাতা (A টু Z)
+### রহিম ইলেকট্রনিক্স: কেন লাগে → কে কী করে → Odoo তে কীভাবে
 
 ---
 
-## কে কে?
+## CRM জিনিসটা আসলে কী?
 
-| কে | কাজ |
+**CRM (Customer Relationship Management)** মানে — তোমার কাছে যত সম্ভাব্য কাস্টমার আসে (ফোন, ফেসবুক, দোকান), তাদের প্রতিটাকে এক জায়গায় ট্র্যাক করা:
+
+```
+কে কী চেয়েছিল
+কবে ফলো-আপ করতে হবে
+বিক্রি হলো নাকি হাতছাড়া হলো
+কোন সেলসম্যানের কাছে কোন ডিল
+```
+
+খাতা বা মাথায় রাখলে হারিয়ে যায়। Odoo CRM সেটাকে সিস্টেমে রাখে।
+
+---
+
+## গল্পের প্রেক্ষাপট — সমস্যাটা কী ছিল
+
+| | |
 |---|---|
-| **রহিম** | Settings / Stages |
-| **সালমা** | Lead → Opportunity → Quotation |
-| ডেমো | নূর টেক, সানরাইজ, জাহিদ |
+| **কোম্পানি** | রহিম ইলেকট্রনিক্স / রহিম ট্রেডার্স — চার্জার, কেবল, ছোট গ্যাজেট |
+| **মালিক** | রহিম ভাই |
+| **সেলসম্যান** | সালমা (দোকান + ফোন) |
+
+রহিম ভাইয়ের সমস্যা:
+
+- ফেসবুক বিজ্ঞাপনের পর প্রতিদিন অনেকে দাম জিজ্ঞেস করে
+- সালমা খাতায় নাম লেখে — ২–৩ দিন পর কাকে কল ব্যাক করতে ভুলে যায়
+- মাস শেষে রহিম জানেন না: কতজন এসেছিল, কতজন কিনেছে, কতজন হারিয়েছে
+- একই কাস্টমারকে দুইজন আলাদা কল করলে কাস্টমার বিরক্ত
+
+**এই সমস্যার সমাধান = Odoo CRM।** নিচে scratch থেকে ধাপে ধাপে।
 
 ```
-Demo ☐ OFF | DB: rahim_crm
-Apps: Contacts + CRM + Sales (+ Inventory যদি Quotation এ স্টক পণ্য চান)
-```
-
----
-
-# দিন ১ — Scratch Login + Install
-
-| Database | `rahim_crm` | Demo ☐ |
-| admin@rahim.com / admin123 | Country BD |
-
-Company রহিম ট্রেডার্স + Timezone
-
-```
-Apps → Contacts → CRM → Sales → Install
-```
-
-মেনু CRM:
-
-```
-Sales (Pipeline) | Leads | Reporting | Configuration
+Demo data ☐ OFF
+DB: rahim_crm
+Apps: Contacts + CRM + Sales
 ```
 
 ---
 
-# দিন ১ — CRM Settings (রহিম) মিনিমাল
+# ধাপ ০ — Scratch Login (রহিম)
+
+```
+http://localhost:8069/web/database/manager
+```
+
+| Field | মান |
+|---|---|
+| Database Name | `rahim_crm` |
+| Email | `admin@rahim.com` |
+| Password | `admin123` |
+| Country | Bangladesh |
+| Demo data | ☐ খালি |
+
+Company: **রহিম ট্রেডার্স** | Timezone: Asia/Dhaka
+
+```
+Apps → Contacts → Install
+Apps → CRM → Install
+Apps → Sales → Install
+```
+
+**এতে লাভ কী:** একই সফটওয়্যারে Contact + ডিল ট্র্যাক + কোটেশন — আলাদা খাতা নয়।
+
+---
+
+# ধাপ ১ — Settings মিনিমাল (রহিম)
 
 ```
 CRM → Configuration → Settings
 ```
 
-| অপশন | মিনিমাল | কী হয় |
+| অপশন | মিনিমাল | ব্যবসায় কী কাজে লাগে |
 |---|---|---|
-| Leads | ☑ | আলাদা Leads মেনু |
-| Predictive Lead Scoring | ☐ | স্কোর |
-| Recurring Revenues | ☐ | সাবস্ক্রিপশন রেভিনিউ |
-| Multi Teams | ☐ | মাল্টি টিম |
-| Online Appointment | ☐ | অ্যাপয়েন্টমেন্ট |
+| **Leads** | ☑ | কাঁচা ইনকোয়ারি আলাদা রাখা — পাইপলাইন ভারী হয় না |
+| Predictive Scoring | ☐ | পরে |
+| Recurring Revenues | ☐ | সাবস্ক্রিপশন ব্যবসা না হলে লাগে না |
+| Multi Teams | ☐ | এক টিম হলে অফ |
+| Online Appointment | ☐ | পরে |
 
-**মিনিমাল:** ☑ Leads → **Save**
+→ **Save**
 
----
-
-# দিন ১ — Configuration মেনু ধরে
-
-| মেনু | কী করবেন | কোথায় লাগে |
-|---|---|---|
-| Settings | উপরে | — |
-| Sales Teams | New: `রহিম সেলস` ঐচ্ছিক | Opportunity Team |
-| Stages | ডিফল্ট রাখুন (New→…→Won) | Pipeline কলাম |
-| Activity Types | ডিফল্ট | Schedule Activity |
-| Lost Reasons | New: `Too expensive` | Lost চাপলে |
-| Tags | Hot / Cold ঐচ্ছিক | কার্ড ট্যাগ |
-| Recurring Plans | স্কিপ | — |
-
-**মিনিমাল:** Lost Reason একটা + Stages না মুছা।
+**এতে লাভ কী:** Leads অন থাকলে “শুধু দাম জিজ্ঞেস” আর “সত্যি কেনার ডিল” আলাদা থাকে — সালমার বোর্ড পরিষ্কার।
 
 ---
 
-# দিন ২ — Contacts Scratch
+# ধাপ ২ — Sales Team (রহিম) — কে কোন ডিল ধরবে
 
-সানরাইজ স্টোর, নূর টেক শপ (Company)
-
----
-
-# দিন ২ — Leads মেনু
-
-New → নূর টেক Combo আগ্রহ | Phone | Expected Revenue 4500 → Save  
-→ Convert to Opportunity  
-
----
-
-# দিন ৩ — Pipeline (Sales) মেনু
-
-কার্ড স্টেজ সরান: Qualified → Proposition  
-→ New Quotation (Sales অ্যাপ) → Product/Qty → Confirm  
-
-Won / Lost (+ Reason)
-
-Schedule Activity: Call কালকের তারিখ
-
----
-
-# Reporting মেনু
-
-Pipeline / Forecast / Won-Lost — ডাটা থাকলে।
-
----
-
-# এক নজরে
+**ব্যবসায়ীর কথা:** “সালমার কাজ আর আমার কাজ আলাদা দেখতে চাই।”
 
 ```
-১  DB + CRM + Sales Install
-২  Settings: Leads ☑ Save
-৩  Lost Reason + Stages চেক
-৪  Lead → Opportunity → Quotation → Won/Lost
+CRM → Configuration → Sales Teams → New
 ```
+
+| Field | ডেমো মান |
+|---|---|
+| Team Name | রহিম সেলস টিম |
+| Team Leader | রহিম (Admin) |
+| Members | সালমা (User বানালে) — না থাকলে পরে |
+
+→ Save
+
+**এতে লাভ কী:**  
+প্রতিটা Lead/Opportunity কোন টিমে যাচ্ছে ট্র্যাক হয়।  
+পরে দ্বিতীয় শাখা খুললে আলাদা টিম = আলাদা হিসাব।  
+কেউ একা সব ডিল “নিজের খাতায়” লুকিয়ে রাখতে পারে না।
+
+---
+
+# ধাপ ৩ — Pipeline Stages সাজানো (রহিম)
+
+CRM খুললে **Kanban বোর্ড** = **Pipeline**।
+
+ডিফল্ট প্রায়:
+
+```
+New → Qualified → Proposition → Won
+```
+
+রহিমের দোকানের বাস্তবতা অনুযায়ী:
+
+```
+CRM → Configuration → Stages
+```
+
+| Stage (ডেমো নাম) | ব্যবসায় মানে |
+|---|---|
+| New Inquiry | নতুন মেসেজ/কল এসেছে |
+| Qualified | সত্যি কেনার আগ্রহ আছে |
+| Price Quoted | দাম/কোটেশন দিয়েছি |
+| Negotiation | দরদাম চলছে |
+| Won | বিক্রি জিতেছি (সিস্টেম স্টেজ) |
+
+Won মুছা যায় না — স্বাভাবিক।
+
+**এতে লাভ কী (পাইপলাইন ভিজিবিলিটি):**  
+রহিম ফোন না করেই বোর্ডে দেখেন — কতজন New এ আটকে (সালমা ফলো-আপ করেনি), কতজন Negotiation এ (প্রায় বিক্রি)।  
+এটাই মালিকের আসল কাজের টুল — “কী অবস্থা?” এক নজরে।
+
+---
+
+# ধাপ ৪ — Lost Reasons (রহিম একবার)
+
+```
+Configuration → Lost Reasons → New
+```
+
+| Reason |
+|---|
+| Price too high |
+| Bought elsewhere |
+| No budget |
+
+**এতে লাভ কী:** মাস শেষে দেখবেন বেশিরভাগ “দাম বেশি” নাকি “অন্য দোকান” — তাহলে প্রাইসিং বা স্টক নিয়ে সিদ্ধান্ত। খাতায় এটা বিশ্লেষণ অসম্ভব।
+
+---
+
+# ধাপ ৫ — একটা Lead তৈরি (সালমার দৈনন্দিন কাজ)
+
+**গল্প:** ফেসবুকে মেসেজ — “Charger Combo Pack এর দাম কত?”  
+নাম: নূর টেক শপ / যোগাযোগকারী নূর। ফোন: 01811000002।
+
+```
+CRM → Leads → New
+```
+
+| Field | ডেমো মান | কেন |
+|---|---|---|
+| Title | Combo Pack Inquiry — নূর টেক | খুঁজে পাওয়া সহজ |
+| Contact Name | নূর / নূর টেক শপ | কে মেসেজ দিয়েছে |
+| Phone | 01811000002 | কল ব্যাক |
+| Email | nur@tech.demo | ঐচ্ছিক |
+| Source / Tag | Facebook | কোন চ্যানেল থেকে এসেছে |
+| Salesperson | সালমা | কার কাছে ডিল |
+| Sales Team | রহিম সেলস টিম | টিম হিসাব |
+| Expected Revenue | 4500 | আন্দাজ বিক্রি |
+
+→ **Save** — এটা এখন **Lead**, এখনো Opportunity নয়।
+
+### Lead vs Opportunity (কোর নলেজ)
+
+| | Lead | Opportunity |
+|---|---|---|
+| মানে | কাঁচা ইনকোয়ারি — যাচাই হয়নি | যাচাই হয়েছে — সিরিয়াস ডিল |
+| উদাহরণ | শুধু দাম জিজ্ঞেস | বাজেট আছে, কিনবে বলেছে |
+| ব্যবসায় লাভ | পাইপলাইন ভারী হয় না | বোর্ডে শুধু গরম ডিল |
+
+**এতে লাভ কী:** সব র‍্যান্ডম মেসেজ সরাসরি Opportunity না বানিয়ে আগে Lead — সালমা ফোন করে Qualify করে তারপর পাইপলাইনে তোলে।
+
+---
+
+# ধাপ ৬ — Lead → Opportunity (সালমা কলের পর)
+
+**গল্প:** সালমা কল করে জানল — নূর টেক সত্যি ১০ প্যাক চাইবে, বাজেট ঠিক করছে।
+
+Lead খুলুন → **Convert to Opportunity**  
+Sales Team: রহিম সেলস টিম → Convert
+
+এখন Pipeline বোর্ডে **New Inquiry / Qualified** স্টেজে কার্ড।
+
+Contact না থাকলে এখানে Customer তৈরি হয়ে যেতে পারে।
+
+**এতে লাভ কী:** যাচাই করা ডিলই বোর্ডে উঠে — মালিকের সময় নষ্ট হয় না ঠান্ডা মেসেজে।
+
+---
+
+# ধাপ ৭ — Activity (Follow-up) — ব্যবসায়ীর সবচেয়ে বড় লাভ
+
+**গল্প:** সালমার আসল সমস্যা ছিল ফলো-আপ ভুলে যাওয়া। এখন আর ভোলা যায় না।
+
+Opportunity → **Schedule Activity**
+
+| Field | ডেমো মান |
+|---|---|
+| Activity Type | Call |
+| Due Date | আগামীকাল |
+| Summary | বাজেট কনফার্ম করতে কল |
+| Assigned to | সালমা |
+
+→ Schedule
+
+**এতে লাভ কী:**
+
+- কাল লগইন করলেই Activities এ কলটা দেখাবে
+- মিস হলে **লাল Overdue** — এড়ানো কঠিন
+- রহিম যেকোনো সময় দেখতে পারেন কার ফলো-আপ বাকি (**Reporting** বা কার্ডের অ্যাক্টিভিটি আইকন)
+
+কল শেষে নোট লিখে **Mark as Done** → পরের Activity শিডিউল — চেইন তৈরি হয়, কিছু হারায় না।
+
+```
+CRM ছাড়া সেলসম্যানের কাজ = মনে রাখা
+CRM সহ সেলসম্যানের কাজ = সিস্টেম মনে রাখে, সে শুধু কল করে
+```
+
+---
+
+# ধাপ ৮ — Opportunity থেকে Quotation (সালমা)
+
+**গল্প:** বাজেট কনফার্ম — এখন দাম পাঠাতে হবে।
+
+Opportunity → **New Quotation** (Sales ইনস্টল থাকতে হবে)
+
+Customer অটো | Product: Charger Combo Pack বা Phone Charger 20W | Qty 10 | Price 450  
+→ Save / Send  
+
+কার্ড স্টেজ **Price Quoted** এ সরান (ড্র্যাগ বা ম্যানুয়াল)।
+
+**এতে লাভ কী:** CRM আর Sales আলাদা সফটওয়্যার নয়।  
+একই জায়গা থেকে ডিল ট্র্যাক → কোটেশন — নাম আবার টাইপ নয়।  
+কাস্টমারকে “আপনার নম্বর আবার বলুন” বলতে হয় না।
+
+Product/স্টক না থাকলে আগে Inventory গাইড — অথবা শুধু CRM শিখতে Quotation ছাড়াও স্টেজ সরানো যায়।
+
+---
+
+# ধাপ ৯ — দরদাম — স্টেজ Drag & Drop
+
+**গল্প:** নূর টেক ছাড় চায় — সালমা দরদাম করছে।
+
+Pipeline এ কার্ড টেনে **Negotiation** কলামে নিন।  
+Expected Revenue / Probability কার্ডে দেখা যায়।
+
+**এতে লাভ কী:** রহিম শুধু বোর্ড দেখে বোঝেন কোন ডিল কতদূর — ফোন করে সালমাকে জিজ্ঞেস করতে হয় না। এটা মালিকের দৈনিক ৫ মিনিটের কাজ।
+
+---
+
+# ধাপ ১০ — Won বা Lost
+
+### Won (বিক্রি জিতলে)
+
+Opportunity → **Won**  
+তারপর Sales Order Confirm → Delivery → Invoice (Sales/Accounting পার্ট)।
+
+```
+CRM Won = ডিল জয়ের পতাকা
+মাল বের = Delivery Validate
+টাকা = Invoice + Payment
+```
+
+**এতে লাভ কী:** জয়ের তালিকা আলাদা — মাসে কত ডিল জিতলেন সংখ্যায় দেখা যায়।
+
+### Lost (হারলে)
+
+**গল্প:** অন্য দোকান থেকে সস্তায় কিনে ফেলল।
+
+→ **Lost** → Reason: Price too high / Bought elsewhere → Confirm
+
+**এতে লাভ কী:**  
+Reporting → Lost Reasons → বেশিরভাগ “দাম বেশি” হলে প্রাইসিং বদলান।  
+খাতায় এমন রিপোর্ট বের করা যায় না।
+
+---
+
+# ধাপ ১১ — ডুপ্লিকেট এড়ানো (সালমার সাবধানতা)
+
+**গল্প:** একই মানুষ অন্য নম্বর/আবার মেসেজ — সালমা নতুন Lead বানাতে গেল।
+
+ফর্মে **Similar Leads** দেখা গেলে পুরনো কার্ড খুলে নোট যোগ করুন — নতুন ডুপ্লিকেট নয়।
+
+**এতে লাভ কী:** একই কাস্টমারকে দুই সেলসম্যান আলাদা কল করে বিব্রত করার অবস্থা কমে। ব্যবসায়ীর জন্য এটা সার্ভিসের মান।
+
+---
+
+# ধাপ ১২ — ইমেইল থেকে অটো Lead (ঐচ্ছিক অ্যাডভান্সড)
+
+```
+CRM → Configuration → Settings → Email Alias
+```
+
+যেমন `sales@rahimtraders.com` এ মেইল এলে Odoo নিজে Lead বানাতে পারে।
+
+**এতে লাভ কী:** ওয়েব ফর্ম/ইমেইল ইনকোয়ারি হাতছাড়া হয় না — কেউ ম্যানুয়ালি এন্ট্রি ভোলে না।
+
+(মেইল সার্ভার সেটআপ লাগে — প্রথমে ম্যানুয়াল Leadই যথেষ্ট।)
+
+---
+
+# ধাপ ১৩ — Reporting — মালিকের সিদ্ধান্তের জায়গা
+
+```
+CRM → Reporting
+```
+
+| দেখবেন | ব্যবসায়ী কী সিদ্ধান্ত নেন |
+|---|---|
+| Pipeline / Forecast | এ মাসে কত বিক্রির আশা |
+| Win Rate | কত % ডিল জিতি |
+| By Salesperson | সালমা কেমন করছে — নতুন সেলস নিব? |
+| By Source | Facebook নাকি রেফারেন্স বেশি কনভার্ট — বিজ্ঞাপন বাজেট কোথায় |
+| Lost Reasons | দাম নাকি স্টক সমস্যা |
+| Activities overdue | কে ফলো-আপ মিস করছে |
+
+**এতে লাভ কী:** অনুমান নয় — সংখ্যা দিয়ে ব্যবসা চালানো। খাতা দিয়ে Win Rate বের করা অসম্ভব।
+
+---
+
+# কে কোন কাজ করে — এক ছক
+
+| কাজ | কে | Odoo মেনু | ব্যবসায় মানে |
+|---|---|---|---|
+| টিম/স্টেজ/Lost Reason সেট | রহিম | Configuration | খেলার মাঠ সাজানো |
+| নতুন মেসেজ Lead লেখা | সালমা | Leads | ইনকোয়ারি হারানো যাবে না |
+| কল করে Qualify + Convert | সালমা | Lead → Opportunity | গরম ডিল বাছা |
+| ফলো-আপ শিডিউল | সালমা | Activities | ভুলে যাওয়া বন্ধ |
+| কোটেশন | সালমা | New Quotation | দাম পাঠানো |
+| বোর্ড দেখা | রহিম | Pipeline | দোকানের অবস্থা এক নজরে |
+| Won/Lost | সালমা | Opportunity | জয়-পরাজয় খাতা |
+| রিপোর্ট | রহিম | Reporting | বিজ্ঞাপন/দাম/মানুষ সিদ্ধান্ত |
+
+---
+
+# কোর নলেজ সারসংক্ষেপ
+
+| ধারণা | মানে | ব্যবসায়ীর লাভ |
+|---|---|---|
+| Lead vs Opportunity | কাঁচা vs যাচাই করা | বোর্ড পরিষ্কার |
+| Pipeline / Stages | ডিল কোন ধাপে | ফোন না করে অগ্রগতি |
+| Activities | শিডিউল ফলো-আপ | মিস কল কমে, Overdue লাল |
+| Lost Reason | কেন হারালাম | প্রাইসিং/প্রতিযোগী বোঝা |
+| Similar Leads | ডুপ্লিকেট ধরা | কাস্টমার বিরক্ত কম |
+| Sales Team | কার ডিল | শাখা/মানুষ হিসাব |
+| Reporting | জয়-হার, সোর্স | ডেটা দিয়ে সিদ্ধান্ত |
+
+**সবচেয়ে বড় কথা:**  
+CRM শুধু সফটওয়্যার নয় — রহিমের মাথা বা সালমার খাতায় আটকে থাকা তথ্যকে কেন্দ্রে আনা, যাতে ব্যবসা **এক-দুইজনের স্মৃতির উপর নয়, সিস্টেমের উপর** দাঁড়ায়।
+
+---
+
+# Scratch এক নজরে
+
+```
+১  DB rahim_crm Demo OFF + Company
+২  Contacts + CRM + Sales Install
+৩  Settings: Leads ☑
+৪  Sales Team + Stages + Lost Reasons
+৫  Lead (ফেসবুক ইনকোয়ারি)
+৬  Convert → Opportunity
+৭  Schedule Activity (কল)
+৮  New Quotation → স্টেজ Price Quoted / Negotiation
+৯  Won বা Lost + Reason
+১০ Reporting দেখা (রহিম)
+```
+
+---
+
+## সমস্যা হলে
+
+| সমস্যা | করণীয় |
+|---|---|
+| Leads মেনু নেই | Settings → Leads ☑ Save |
+| New Quotation নেই | Sales Install |
+| Activities দেখি না | Opportunity খুলে Schedule Activity |
+| Pipeline খালি | Lead Convert বা New Opportunity |
+
+---
+
+এরপর চাইলে: CRM + Sales + Delivery + Invoice এক গল্পে (Full ERP গাইড)।
