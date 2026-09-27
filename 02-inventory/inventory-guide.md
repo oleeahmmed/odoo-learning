@@ -1,60 +1,51 @@
-# Inventory — একদম সহজ গাইড
-### রহিম ভাইয়ের গুদাম: মাল কোথায়, কত আছে
+# Inventory — সহজ গল্পে সম্পূর্ণ সেটআপ
+### রহিম ট্রেডার্স: Contacts এর পর গুদাম → পণ্য → মাল ঢোকানো/বের করা
 
 ---
 
-## আগে কোথায় ছিলেন?
+## গল্প: অফিসে কে কে?
 
-Contacts পার্টে আপনি:
+| কে | ভূমিকা | Odoo তে কী করে |
+|---|---|---|
+| **রহিম ভাই** | মালিক | Warehouse/Location সেট করে |
+| **জাবেদ** | স্টোরকিপার | Receipt, Delivery, তাক দেখে |
+| **ঢাকা ইলেকট্রনিক্স** | Vendor | মাল আসে যাদের কাছ থেকে |
+| **সানরাইজ স্টোর** | Customer | মাল যায় যাদের কাছে |
+| **Phone Charger 20W** | পণ্য | Lot দিয়ে ট্র্যাক |
 
 ```
-☑ Database খুলেছেন
-☑ Company: রহিম ট্রেডার্স
-☑ Contacts ইনস্টল করেছেন
-☑ Vendor: ঢাকা ইলেকট্রনিক্স
-☑ Customer: সানরাইজ স্টোর
+আগে Contacts পার্ট করুন (একই DB rahim_traders চলবে)
+Demo data ☐ OFF
+অ্যাপ = Inventory (+ Contacts আগেই আছে)
 ```
 
-আজ শুধু **গুদামের খাতা** — Inventory।
+---
 
-একই database-এ থাকুন। নতুন database লাগবে না।
+## সোনার নিয়ম
+
+```
+১  Settings টিক → Save আগে
+২  Stock এর Parent = WH (খালি রাখবেন না)
+৩  তাক বানালেই মাল যায় না — Receipt এ To বাছতে হয়
+৪  Lot পণ্যে ≡ তে Lot+Qty — মেইন লাইনে Serial নয়
+৫  Product আগে → তারপর Receipt/Delivery
+```
 
 ---
 
-## আজকের গল্প
+# দিন ১ — Inventory ইনস্টল + Settings (রহিম)
 
-রহিম ভাইয়ের একটা গুদাম আছে।  
-ভিতরে একটা স্টোর রুম (**Stock**)।  
-রুমের ভিতরে দুই তাক: **Tak-1**, **Tak-2**।
-
-ঢাকা ইলেকট্রনিক্স থেকে মাল আসবে → Receipt।  
-সানরাইজকে মাল যাবে → Delivery।
-
----
-
-# ধাপ ১ — Inventory ইনস্টল
+Contacts আছে ধরে Login (`rahim_traders`)।
 
 ```
 Apps → Inventory → Install
 ```
 
-উপরে মেনুতে **Inventory** দেখা গেলে OK।
-
----
-
-# ধাপ ২ — Settings-এ টিক
-
 ```
-Inventory অ্যাপ → উপরে ⚙ Settings
+Inventory → Configuration → Settings
 ```
 
-অথবা:
-
-```
-মেনু Settings → Inventory
-```
-
-এগুলোতে টিক দিন:
+টিক দিন:
 
 ```
 ☑ Storage Locations
@@ -62,123 +53,49 @@ Inventory অ্যাপ → উপরে ⚙ Settings
 ☑ Multi-Step Routes
 ```
 
-→ উপরে **Save**
+→ **Save**
 
-Save এর পর Warehouse অংশে লিঙ্ক দেখা যেতে পারে (`→ Locations` ইত্যাদি)।  
-এখন সেগুলোতে যেতে হবে না — আমরা Inventory অ্যাপের **Configuration** মেনু দিয়ে যাব।
+রহিম: “এখন তাক ও লট চালু।”
 
----
-
-# ধাপ ৩ — Inventory মেনু চিনুন
-
-```
-Apps মেনু থেকে Inventory খুলুন
-```
-
-উপরে টপ মেনু দেখবেন:
-
-```
-Overview | Operations | Products | Reporting | Configuration
-```
-
-| মেনু | সহজ মানে |
-|---|---|
-| Overview | গুদামের সারাংশ |
-| Operations | Receipt, Delivery, Transfer |
-| Products | পণ্য |
-| Reporting | রিপোর্ট |
-| Configuration | Warehouse, Location সেটআপ |
-
-আজ কাজের ক্রম:
-
-```
-Configuration → Products → Operations
-```
+**জাবেদ পরে কী দেখবে:** Operations মেনুতে Receipts / Delivery।
 
 ---
 
-# ধাপ ৪ — Warehouse দেখুন
+# দিন ১ বিকেল — Warehouse ও Location (রহিম)
+
+## Warehouse
 
 ```
 Inventory → Configuration → Warehouses
 ```
 
-একটা warehouse ইতিমধ্যে আছে — দোকান খোলার সময় Odoo বানিয়েছে।
+একটা warehouse আগেই আছে (রহিম ট্রেডার্স / WH)।  
+নাম ঠিক আছে কিনা দেখে Save। শিখতে **একটাই** রাখুন।
 
-নাম সাধারণত **রহিম ট্রেডার্স** বা **WH** জাতীয়।
-
-### চাইলে এডিট
-
-Warehouse খুলুন → নাম/ঠিকানা ঠিক করুন → **Save**
-
-### চাইলে আরেকটা বানান
-
-**New** → নাম দিন → Save  
-(শিখতে এখন **একটাই** warehouse রাখুন — সহজ থাকবে।)
-
-মনে রাখুন: এখন আপনার **একটা গুদাম** আছে।
-
----
-
-# ধাপ ৫ — Location দেখুন (Stock)
+## Stock চেক (Parent জরুরি)
 
 ```
-Inventory → Configuration → Locations
+Configuration → Locations → Stock খুলুন
 ```
 
-লিস্টে **Stock** নামের একটা location খুঁজুন → খুলুন।
-
-দেখবেন মোটামুটি:
-
-| Field | মানে |
+| Field | থাকতে হবে |
 |---|---|
-| Location Name | Stock |
-| Parent Location | আপনার warehouse (যেমন WH) |
-| Location Type | Internal Location |
+| Parent Location | **WH** (নাম `WH/Stock`) |
+| Type | Internal Location |
 
-**গল্প:**
+Parent খালি থাকলে Receipt Done হলেও On Hand ০ দেখায় — মুছবেন না।
 
-```
-Warehouse (গুদাম)
- └── Stock (স্টোর রুম)    ← এখন যেটা খুলেছেন
-```
+## তাক বানান — Tak-1, Tak-2
 
-Parent = warehouse মানে: এই Stock রুমটা **ঐ গুদামের ভিতরে**।
+Locations → **New**:
 
-Parent মুছবেন না। শুধু দেখে বুঝুন → পিছনে Locations লিস্টে ফিরুন।
+| Field | Tak-1 | Tak-2 |
+|---|---|---|
+| Name | Tak-1 | Tak-2 |
+| Parent | Stock | Stock |
+| Type | Internal | Internal |
 
----
-
-# ধাপ ৬ — দুই তাক বানান (Tak-1, Tak-2)
-
-Locations লিস্টে থাকুন।
-
-### Tak-1
-
-1. **New**
-2. লিখুন:
-
-| Field | মান |
-|---|---|
-| Location Name | Tak-1 |
-| Parent Location | **Stock** (আগের ডিফল্ট স্টোর রুম) |
-| Location Type | Internal Location |
-
-3. **Save**
-
-### Tak-2
-
-আবার **New**:
-
-| Field | মান |
-|---|---|
-| Location Name | Tak-2 |
-| Parent Location | **Stock** |
-| Location Type | Internal Location |
-
-→ **Save**
-
-### এখন আপনার ছবি এমন
+→ Save
 
 ```
 Warehouse
@@ -187,30 +104,37 @@ Warehouse
       └── Tak-2
 ```
 
-লিস্টে নাম দেখা যাবে মোটামুটি:
-
-```
-WH/Stock
-WH/Stock/Tak-1
-WH/Stock/Tak-2
-```
-
-হলে configure ঠিক আছে।
+**জাবেদ পরে কী দেখবে:** Receipt এর To তে Tak-1 বাছতে পারবে।
 
 ---
 
-# ধাপ ৭ — Product যোগ করুন
+# দিন ২ সকাল — Vendor/Customer আছে তো? (জাবেদ চেক)
+
+Contacts থেকে আগে থাকার কথা:
+
+```
+☑ Dhaka Electronics Ltd
+☑ সানরাইজ স্টোর
+```
+
+না থাকলে Contacts পার্টের মতো হাতে বানান।
+
+---
+
+# দিন ২ দুপুর — পণ্য (রহিম + জাবেদ)
 
 ```
 Inventory → Products → Products → New
 ```
 
-| Field | মান |
+| Field | ডেমো মান |
 |---|---|
-| Product Name | Phone Charger 20W |
+| Name | Phone Charger 20W |
 | Product Type | **Storable Product** |
 | Sales Price | 350 |
 | Cost | 220 |
+| Can be Sold | ☑ |
+| Can be Purchased | ☑ |
 
 ট্যাব **Inventory**:
 
@@ -220,213 +144,68 @@ Inventory → Products → Products → New
 
 → **Save**
 
-**গল্প:** By Lots = এক ব্যাচে অনেক পিস (যেমন CH-001 তে ৫০ পিস)।
+```
+By Lots = এক ব্যাচ CH-001 তে অনেক পিস
+Unique Serial = প্রতি পিস আলাদা — এখন ব্যবহার করবেন না
+```
 
 ---
 
-# ধাপ ৭ক — পণ্য কোন তাক / কোন গুদামে যাবে?
+# দিন ২ বিকেল — কোন তাকে যাবে? (রহিম শেখায়)
 
-ডিফল্টে Receipt করলে মাল **ঐ warehouse-এর Stock** এ যায়।  
-আলাদা তাক বা আলাদা গুদাম চাইলে **সেট** করতে হয়।
+তাক বানালেই মাল অটো যায় **না**।
 
----
-
-## কেন সবসময় Stock এ যায়?
-
-Receipt ফর্মে একটা **Operation Type** থাকে — যেমন:
-
-```
-রহিম ট্রেডার্স: Receipts
-```
-
-এটা কোন warehouse-এর Receipts → মাল সেই গুদামের **Stock** এ যায়।  
-তাক আলাদা করতে বা গুদাম আলাদা করতে নিচের দুই রাস্তা।
-
----
-
-## ক) একই গুদাম — আলাদা তাক (সবচেয়ে সহজ)
-
-**গল্প:** চার্জার সবসময় Tak-1 এ রাখব। কেবল অন্য পণ্য Tak-2 এ।
-
-### একবার নিয়ম বানান (Putaway)
-
-```
-Inventory → Configuration → Putaway Rules → New
-```
-
-| Field | মান |
+| উপায় | কী হয় |
 |---|---|
-| Product | Phone Charger 20W |
-| Store to / Location | **Tak-1** (WH/Stock/Tak-1) |
+| ডিফল্ট | Receipt → সাধারণত **Stock** এ |
+| হাতে | ≡ Detailed Ops এ **To = Tak-1** |
+| Putaway Rule | Configuration → Putaway Rules → Product → Store to Tak-1 |
 
-→ **Save**
-
-এর পর এই পণ্য Receipt করলে Odoo চেষ্টা করবে **Tak-1** এ পাঠাতে।
-
-আরেক পণ্য (যেমন Cable) Tak-2 এ চাইলে আরেকটা Putaway Rule:
-
-| Product | Store to |
-|---|---|
-| USB Cable | Tak-2 |
-
-### অথবা হাতে (প্রতিবার)
-
-Receipt → Mark as Todo → ≡ এ **To = Tak-1** বাছুন।  
-Putaway না থাকলে এভাবেই তাক ঠিক হয়।
-
-```
-Putaway  = একবার সেট → পরে অটো
-To ফিল্ড = শুধু এই Receipt-এর জন্য
-```
+শিখতে Receipt এ **To = Tak-1** হাতে বাছুন।
 
 ---
 
-## খ) আলাদা গুদাম
+# দিন ৩ — Receipt (জাবেদ): মাল ঢোকানো
 
-**গল্প:** ঢাকায় এক গুদাম, চট্টগ্রামে আরেক গুদাম।
-
-### গুরুত্বপূর্ণ সত্য (মনে রাখুন)
-
-Odoo Product ফর্মে এমন ফিল্ড **নেই**:
-
-```
-Default Warehouse = চট্টগ্রাম   ← এমন কিছু নেই
-```
-
-মানে: “এই পণ্য সবসময় শুধু এই গুদাম ব্যবহার করবে” — **এক ক্লিকে সেট হয় না**।
-
-Odoo-র নিয়ম অন্যরকম:
-
-```
-পণ্য  = কী মাল
-গুদাম = কোন ডকুমেন্টে (Receipt / SO / PO) আপনি বেছে নিলেন
-তাক   = Putaway বা To দিয়ে সেট করা যায়
-```
-
-তাই গুদাম বেছে নিতে হয় **Receipt / Delivery ফর্মে** — Product সেভে নয়।
-
-### ১) দ্বিতীয় warehouse বানান
-
-```
-Inventory → Configuration → Warehouses → New
-```
-
-| Field | মান |
-|---|---|
-| Warehouse Name | চট্টগ্রাম গুদাম |
-| Short Name | CTG |
-
-→ **Save**
-
-Odoo নিজেই এই গুদামের Stock (এবং Receipts/Delivery) বানিয়ে দেবে।
-
-চাইলে সেই গুদামের Stock-এর নিচে আবার তাক বানাতে পারেন (Parent = ঐ Stock)।
-
-### ২) Receipt-এ সঠিক গুদাম বাছুন
+**গল্প:** ঢাকা ইলেকট্রনিক্স থেকে ৫০ পিস এল। ব্যাচ CH-001।
 
 ```
 Inventory → Operations → Receipts → New
 ```
 
-ফর্মে **Operation Type** দেখুন — এখানেই গুদাম বেছে নেন:
-
-| চাইলে | Operation Type |
-|---|---|
-| ঢাকা গুদামে মাল | রহিম ট্রেডার্স: Receipts (বা WH: Receipts) |
-| চট্টগ্রামে মাল | চট্টগ্রাম গুদাম: Receipts (CTG: Receipts) |
-
-→ Destination Location অটো **ঐ গুদামের Stock** হবে।
-
-তারপর Todo → Lot → Validate — আগের মতোই।
-
-```
-কোন গুদাম?  →  Receipt-এর Operation Type  (Product-এ সেট হয় না)
-কোন তাক?    →  Putaway Rule অথবা ≡ এর To  (এটাই Product অনুযায়ী সেট করা যায়)
-```
-
-### চাইলে আনুমানিক “পণ্য → গুদাম” অভ্যাস
-
-পরে Sales/Purchase পার্টে দেখবেন: অর্ডারে Warehouse বাছতে হয়।  
-Inventory-তে চাইলে **Reordering Rules** দিয়ে বলা যায় “এই পণ্য এই গুদামে মজুত রাখো” — কিন্তু Receipt স্বয়ংক্রিয়ভাবে সেই গুদামে বাধ্য হয় না; Receipt-এ Operation Type তবু ঠিক রাখতে হয়।
-
----
-
-## ছোট চেক
-
-Receipt Done এর পর:
-
-```
-Products → Phone Charger 20W → On Hand বাটন
-```
-
-Location দেখুন — Tak-1 / CTG Stock ইত্যাদি যেখানে সেট করেছেন সেখানেই থাকবে।
-
----
-
-# ধাপ ৮ — Receipt (মাল ঢোকানো)
-
-**গল্প:** ঢাকা ইলেকট্রনিক্স থেকে চার্জার ৫০ পিস এল। ব্যাচ CH-001।
-
-```
-Inventory → Operations → Receipts → New
-```
-
-### ফর্ম
-
 | Field | মান |
 |---|---|
-| Receive From | Dhaka Electronics Ltd (আপনার Vendor) |
-| Operation Type | কোন গুদামে ঢোকাবেন — সেই গুদামের Receipts (ধাপ ৭ক) |
-
-লাইন Add করুন:
-
-| Field | মান |
-|---|---|
+| Receive From | Dhaka Electronics Ltd |
 | Product | Phone Charger 20W |
 | Demand | 50 |
 
-→ উপরে **Mark as Todo**
+→ **Mark as Todo**
 
-### Lot দিন
-
-প্রোডাক্ট লাইনের ডানে **≡** (লিস্ট) আইকন চাপুন।
+লাইন ডানে **≡** (Detailed Operations — Forecast এর পরের লিস্ট আইকন; একদম ডানের field hide নয়):
 
 | Field | মান |
 |---|---|
 | Lot | CH-001 |
 | Quantity | 50 |
-| To | Stock অথবা Tak-1 |
+| To | **Tak-1** |
 
-> **To** = মাল কোন জায়গায় যাবে।  
-> কিছু না বদলালে সাধারণত **Stock** এ যায়।  
-> Tak-1 তে রাখতে চাইলে **To = Tak-1** বাছুন।
+→ Confirm → উপরে **Validate** → Done
 
-→ Confirm / Save
+**রহিম কী দেখবে:**  
+Products → Phone Charger → On Hand ≈ 50  
+On Hand বাটনে Location = Tak-1
 
-মূল পেজে Quantity ≈ 50 দেখলে:
-
-→ উপরে **Validate**
-
-স্ট্যাটাস **Done** হলে Receipt শেষ।
+```
+Confirm/Todo ≠ মাল ঢোকা
+Validate = মাল ঢোকা
+Serial কলাম ছোঁবেন না
+```
 
 ---
 
-# ধাপ ৯ — স্টক দেখুন
+# দিন ৪ — Delivery (জাবেদ): মাল বের করা
 
-```
-Inventory → Products → Phone Charger 20W
-```
-
-**On Hand** ≈ 50
-
-কোন তাকে আছে জানতে: উপরে **On Hand** বাটন চাপুন।  
-Location কলামে দেখাবে Stock বা Tak-1।
-
----
-
-# ধাপ ১০ — Delivery (মাল বের করা)
-
-**গল্প:** সানরাইজ স্টোর ২০ পিস নিল।
+**গল্প:** সানরাইজকে ২০ পিস দিতে হবে।
 
 ```
 Inventory → Operations → Delivery Orders → New
@@ -434,82 +213,55 @@ Inventory → Operations → Delivery Orders → New
 
 | Field | মান |
 |---|---|
-| Deliver To | সানরাইজ স্টোর (আপনার Customer) |
-
-লাইন:
-
-| Field | মান |
-|---|---|
+| Deliver To | সানরাইজ স্টোর |
 | Product | Phone Charger 20W |
 | Quantity | 20 |
 
-→ **Mark as Todo** (লাগলে)
+→ Mark as Todo → ≡ এ Lot **CH-001**, Qty 20 → **Validate**
 
-→ লাইনের **≡** এ Lot = **CH-001**, Quantity = 20
-
-→ **Validate**
-
-### চেক
-
-Product আবার খুলুন:
-
-```
-On Hand ≈ 30   (50 − 20)
-```
-
-হলে Delivery ঠিক।
+On Hand ≈ ৩০ (৫০−২০)।
 
 ---
 
-# (ঐচ্ছিক) ধাপ ১১ — এক তাক থেকে অন্য তাকে
+# দিন ৫ — তাক থেকে তাকে (ঐচ্ছিক)
 
-মাল যদি Tak-1 এ থাকে, ১০ পিস Tak-2 তে সরাতে:
-
-```
-Inventory → Operations → Transfers → New
-```
-
-| Field | মান |
-|---|---|
-| From | …/Stock/Tak-1 |
-| To | …/Stock/Tak-2 |
-| Product | Phone Charger 20W |
-| Quantity | 10 |
-| Lot | CH-001 |
-
-→ Validate
-
-আগে Product → **On Hand** বাটন দিয়ে দেখুন মাল কোন তাকে আছে — সেটাই **From**।
-
----
-
-# এক নজরে পুরো ক্রম
+মাল Tak-1 এ আছে জেনে (On Hand বাটন):
 
 ```
-১  Inventory Install
-২  Settings → টিক → Save
-৩  Configuration → Warehouses
-৪  Configuration → Locations → Stock + Tak-1/Tak-2
-৫  Product (By Lots)
-৬  ধাপ ৭ক: তাক = Putaway / To ; গুদাম = Operation Type
-৭  Receipt → Delivery
+Operations → Transfers → New
+From: Tak-1 | To: Tak-2 | Product + Lot | Qty 10 → Validate
 ```
 
 ---
+
+# কে কখন কোন মেনু
+
+| মেনু | রহিম | জাবেদ |
+|---|---|---|
+| Settings / Locations | একবার সেট | দেখে |
+| Products | ট্র্যাকিং সেট | On Hand চেক |
+| Receipts / Delivery | দেখে | **প্রতিদিন** |
+| Reporting → Locations | চেক | কোন তাকে কত |
+
+---
+
+# এক নজরে
+
+```
+১  Inventory Install + Settings টিক
+২  Stock Parent=WH | Tak-1, Tak-2
+৩  Product By Lots
+৪  Receipt → Todo → ≡ Lot+To=Tak-1 → Validate
+৫  Delivery → Lot → Validate
+৬  On Hand বাটনে তাক দেখা
+```
 
 ## সমস্যা হলে
 
-| সমস্যা | কী করবেন |
+| সমস্যা | করণীয় |
 |---|---|
-| Inventory মেনু নেই | ধাপ ১ Install |
-| Location / Lot অপশন নেই | ধাপ ২ টিক → Save |
-| Stock-এর Parent খালি | Parent = আপনার Warehouse (WH) দিন → Save |
-| Receive From খালি | Contacts-এ Vendor আগে সেভ আছে তো? |
-| Lot চায় / Validate error | ≡ এ Lot + Quantity দিন, তারপর Validate |
-| সবসময় Stock এ যায় | ধাপ ৭ক: Putaway দিয়ে তাক সেট করুন, বা ≡ এ To বাছুন |
-| অন্য গুদামে পাঠাতে চাই | Receipt → Operation Type = ঐ গুদামের Receipts |
+| On Hand ০ অথচ Receipt Done | Stock Parent = WH |
+| Qty অটো ১ | Serial কলাম ছোঁবেন না; ≡ এ Lot |
+| কোন তাকে জানি না | Product → On Hand বাটন |
 
----
-
-এই ফাইল উপর থেকে **ধাপ ১ → ১০** একটার পর একটা করুন।  
-আগে Contacts, এখন গুদাম — এতেই রহিম ভাইয়ের ফ্লো সম্পূর্ণ।
+পরের পার্ট **Sales**: সানরাইজকে Quotation → Delivery অটো।
