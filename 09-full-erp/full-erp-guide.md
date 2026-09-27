@@ -1,392 +1,350 @@
-# পার্ট ০৯ — Full ERP Integration
-### নকশি টেক্সটাইল — সব Module একসাথে
+# Full ERP — সহজ গল্পে সম্পূর্ণ ইন্টিগ্রেশন
+### রহিম ট্রেডার্স: এক Database এ সব মডিউল — Lead থেকে টাকা পর্যন্ত
 
 ---
 
-## Business পরিচয়
+## গল্প: একটাই দোকান, একটাই খাতা
 
-**নকশি টেক্সটাইল** একটা পোশাক কোম্পানি।
+আলাদা আলাদা পার্টে আপনি শিখেছেন:
 
 ```
-মালিক:    রুমানা বেগম
-ব্যবসা:   কাপড় কিনে, শার্ট তৈরি করে, বিক্রি করে
-Module:   CRM + Sales + Inventory + Purchase +
-          Manufacturing + Accounting + HR
-সমস্যা:   সব কিছু আলাদা আলাদাভাবে manage করছেন
-          একটা order থেকে শেষ পর্যন্ত কী হচ্ছে
-          কেউ বলতে পারেন না
+Contacts → Inventory → Sales → Purchase → Accounting → Manufacturing → CRM
+```
+
+এখন **একটা Database** এ সব একসাথে।  
+একটা কাস্টমার অর্ডার থেকে শেষ পর্যন্ত কে কী করে — পুরো ছবি।
+
+| কে | ভূমিকা | মডিউল |
+|---|---|---|
+| **রহিম ভাই** | মালিক | সব দেখে, রিপোর্ট |
+| **সালমা** | সেলস + CRM | Lead, Quotation, SO |
+| **জাবেদ** | স্টোর | Receipt, Delivery, MO স্টক |
+| **রফিক** | প্রোডাকশন | Manufacturing Order |
+| **করিম** | হিসাব | Invoice, Bill, Payment |
+| **সালমা (HR হালকা)** | অথবা HR ক্লার্ক | Employee রেকর্ড |
+
+```
+Demo data ☐ OFF
+DB নাম: rahim_full_erp
+একবারে সব Apps Install → তারপর মাস্টার ডাটা → তারপর একটা End-to-End অর্ডার
 ```
 
 ---
 
-## ধাপ ১ — Fresh Database তৈরি করুন
+## সোনার নিয়ম (পুরো ERP)
+
+```
+১  আগে Apps + Settings
+২  তারপর মানুষ (Contact/Employee)
+৩  তারপর পণ্য + BOM + স্টক
+৪  তারপর কেনা (কাঁচামাল)
+৫  তারপর তৈরি (MO)
+৬  তারপর CRM/Sales (বিক্রি)
+৭  তারপর Delivery
+৮  শেষে Invoice/Bill/Payment (হিসাব)
+কোনো ধাপ এড়িয়ে সামনে যাবেন না
+```
+
+---
+
+# দিন ১ সকাল — খাতা খোলা (রহিম)
 
 ```
 http://localhost:8069/web/database/manager
-
-Master Password:  admin
-Database Name:    nakshi_textile
-Email:            admin@nakshi.com
-Password:         admin123
-Language:         English
-Country:          Bangladesh
-Demo data:        ☑ ON
 ```
 
-→ **Create Database** → Login করুন।
+| Field | মান |
+|---|---|
+| Database Name | `rahim_full_erp` |
+| Email | `admin@rahim.com` |
+| Password | `admin123` |
+| Country | Bangladesh |
+| Demo data | ☐ খালি |
 
-### Company ও Timezone সেট করুন
-
-Settings → Companies → company নামে click:
-```
-Company Name:  নকশি টেক্সটাইল
-Country:       Bangladesh
-Currency:      BDT
-```
-Save। উপরে ডানদিকে নামে click → Preferences → `Timezone: Asia/Dhaka` → Save।
+Create → Login  
+Company: **রহিম ট্রেডার্স** → Timezone Asia/Dhaka → Save
 
 ---
 
-## ধাপ ২ — সব Apps Install করুন
+# দিন ১ দুপুর — সব Apps একসাথে (রহিম)
 
 ```
-CRM             → Install
-Sales           → Install
-Purchase        → Install
-Inventory       → Install
-Manufacturing   → Install
-Invoicing       → Install
-Accounting      → Install
-Employees       → Install
+Apps → একটা একটা Install:
 ```
+
+```
+☑ Contacts
+☑ CRM
+☑ Sales
+☑ Purchase
+☑ Inventory
+☑ Manufacturing
+☑ Invoicing
+☑ Employees   (HR বেসিক)
+```
+
+Accounting মেনু বেশি চাইলে: Developer mode → Groups → **Show Full Accounting Features** → admin Add।
+
+Inventory Settings:
+
+```
+☑ Storage Locations
+☑ Lots & Serial Numbers
+→ Save
+```
+
+Purchase Settings (মিনিমাল):
+
+```
+☑ Warnings
+Bill Control: Received quantities
+→ Save
+```
+
+রহিম: “সব অ্যাপ লাগল — এখন খাতার মানুষ ও মাল।”
 
 ---
 
-## ধাপ ৩ — Settings Configure করুন
+# দিন ১ বিকেল — মাস্টার ডাটা (রহিম + দল)
 
-Inventory → Configuration → Settings:
-```
-Storage Locations:   ☑
-Lots & Serial:       ☑
-Multi-Step Routes:   ☑
-```
+## Contact
 
-Manufacturing → Configuration → Settings:
-```
-Work Orders:         ☑
-```
+| Type | Name | পরে ব্যবহার |
+|---|---|---|
+| Company | Dhaka Electronics Ltd | Vendor |
+| Company | সানরাইজ স্টোর | Customer |
+| Company | নূর টেক শপ | CRM Lead/Customer |
 
----
-
-## ধাপ ৪ — সব Master Data তৈরি করুন
-
-### Raw Material Products
+## Employee (হালকা HR)
 
 ```
-Product: সুতি কাপড় (মিটার)
-Type:    Storable Product
-Cost:    120
-Tracking: By Lots
-
-Product: বোতাম (ডজন)
-Type:    Storable Product
-Cost:    30
-
-Product: সেলাই সুতা (রিল)
-Type:    Storable Product
-Cost:    80
+Employees → New
 ```
 
-### Finished Product
+| Name | Job |
+|---|---|
+| সালমা | Sales Executive |
+| জাবেদ | Store Keeper |
+| রফিক | Production |
+| করিম | Accountant |
+
+(User অ্যাকাউন্ট পরে দিলে আলাদা লগইন চলে — শিখতে Admin দিয়েই সব করা যায়।)
+
+## Warehouse / তাক
+
+Stock Parent = WH।  
+Tak-1 বানান (Parent = Stock) — তৈরি/কেনা মাল রাখতে।
+
+## পণ্য
+
+| Product | Type | নোট |
+|---|---|---|
+| USB Cable 1m | Storable | কাঁচামাল / কেনা |
+| Plastic Case | Storable | কাঁচামাল |
+| Charger Combo Pack | Storable | তৈরি + বিক্রি |
+| Phone Charger 20W | Storable | সরাসরি কেনা-বেচা (ঐচ্ছিক) |
+
+Tracking: Combo/Charger এ **By Lots** চাইলে Inventory পার্টের মতো।
+
+## BOM
 
 ```
-Product: পুরুষদের শার্ট (নীল, M)
-Type:    Storable Product
-Sales:   850
-Cost:    450
-Tracking: By Serial Number
+Manufacturing → Bills of Materials
 ```
 
-### Bill of Materials (BOM)
-
-Manufacturing → Products → Bills of Materials → New
+Charger Combo Pack = USB Cable 1 + Plastic Case 1 → Save
 
 ```
-Product:  পুরুষদের শার্ট (নীল, M)
-Quantity: 1
-```
-
-Components Tab:
-```
-সুতি কাপড়: 2.5 মিটার
-বোতাম:     1 ডজন
-সেলাই সুতা: 0.5 রিল
-```
-
-Save।
-
----
-
-## ধাপ ৫ — Customer ও Supplier তৈরি করুন
-
-```
-Customer:  Style House BD (customer_rank=1)
-Supplier:  Padma Textile Mills (supplier_rank=1)
+Product ও BOM আগে — MO পরে
+Contact আগে — SO/PO পরে
 ```
 
 ---
 
-## ধাপ ৬ — CRM থেকে শুরু করুন
+# দিন ২ — End-to-End গল্প ১: কাঁচামাল কিনে তৈরি
 
-Style House BD আগ্রহ দেখিয়েছে।
-
-CRM → My Pipeline → New
+## সকাল — Purchase (সালমা / করিম)
 
 ```
-Opportunity Name:  Style House BD - ৫০০ শার্ট অর্ডার
-Customer:          Style House BD
-Expected Revenue:  425000
+Purchase → RFQ → Vendor: ঢাকা ইলেকট্রনিক্স
 ```
 
-**Activities** যোগ করুন — কখন follow up করবেন।
+| Product | Qty | Price |
+|---|---|---|
+| USB Cable 1m | 100 | 70 |
+| Plastic Case | 100 | 40 |
 
----
+→ Confirm Order  
 
-## ধাপ ৭ — CRM → Sales Order
+**জাবেদ:** Receipt → Todo → Validate (To = Tak-1)  
+**করিম:** Create Bill → Confirm → (ঐচ্ছিক) Payment
 
-Deal confirm হলো।
+স্টক: Cable 100, Case 100।
 
-Opportunity-তে **New Quotation** চাপুন।
+## দুপুর — Manufacturing (রফিক)
 
 ```
-Customer:  Style House BD
-Product:   পুরুষদের শার্ট (নীল, M)
-Quantity:  500
-Price:     850
-```
-
-**Confirm** করুন।
-
-এখন হলো:
-```
-CRM Opportunity    → Won ✓
-Sales Order        → Confirmed ✓
-Delivery Order     → তৈরি হয়েছে (stock নেই, তাই Waiting)
-```
-
----
-
-## ধাপ ৮ — Manufacturing Order
-
-শার্ট বানাতে হবে।
-
 Manufacturing → Manufacturing Orders → New
-
-```
-Product:   পুরুষদের শার্ট (নীল, M)
-Quantity:  500
+Product: Charger Combo Pack | Qty: 20
+→ Confirm → Check Availability → Produce / Done
 ```
 
-**Confirm** চাপুন।
+স্টক: Cable/Case ≈ ৮০ করে; Combo Pack ≈ **২০**।
 
-দেখবেন Components-এ কী কী লাগবে:
-```
-সুতি কাপড়:  1250 মিটার  (500 × 2.5)
-বোতাম:       500 ডজন
-সেলাই সুতা:  250 রিল
-```
-
-কিন্তু এগুলো stock-এ নেই!
+**রহিম কী দেখবে:** Inventory On Hand এ Combo এসেছে।
 
 ---
 
-## ধাপ ৯ — Raw Material কেনা
+# দিন ৩ — End-to-End গল্প ২: CRM থেকে বিক্রি ও টাকা
 
-তানভীর (Purchase Manager) কাপড় কিনবেন।
-
-Purchase → New RFQ:
+## সকাল — CRM (সালমা)
 
 ```
-Vendor:   Padma Textile Mills
-Product:  সুতি কাপড়
-Qty:      1500 মিটার (কিছু extra)
+CRM → Leads → New
 ```
 
-Confirm → Receipt Validate করুন।
+| Field | মান |
+|---|---|
+| Name | নূর টেক — Combo ১০ প্যাক |
+| Customer | নূর টেক শপ |
+| Expected Revenue | 4500 |
 
-বোতাম ও সুতাও কিনুন।
+→ Convert to Opportunity → স্টেজ: Qualified → Proposition
+
+## দুপুর — Sales Quotation (সালমা)
+
+Opportunity → **New Quotation**  
+অথবা Sales → Quotations → New
+
+| Field | মান |
+|---|---|
+| Customer | নূর টেক শপ |
+| Product | Charger Combo Pack |
+| Quantity | 10 |
+| Price | 450 |
+
+→ Confirm (Sales Order)
+
+```
+Confirm = অটো Delivery তৈরি
+```
+
+## বিকেল — Delivery (জাবেদ)
+
+SO → Delivery → Todo → Lot (লাগলে) → **Validate**
+
+Combo On Hand ≈ ১০ (২০−১০)।
+
+## সন্ধ্যা — Invoice + Payment (করিম)
+
+SO → Create Invoice → **Regular invoice** → Confirm  
+→ Register Payment → Bank Journal
+
+CRM Opportunity → **Won**
+
+**রহিম কী দেখবে:**
+
+```
+CRM     → Won ডিল
+Sales   → SO Done path
+Inventory → স্টক কমেছে
+Invoicing → Posted Invoice + Payment
+Reporting → P&L এ আয়
+```
+
+একটাই গল্প — ছয়টা মডিউল।
 
 ---
 
-## ধাপ ১০ — Manufacturing Order Produce করুন
+# দিন ৪ — আরেকটা ছোট ফ্লো: শুধু চার্জার কেনা-বেচা
 
-Manufacturing → Manufacturing Orders
+BOM ছাড়াও চলে:
 
-Manufacturing Order খুলুন।
+1. Purchase → Phone Charger 50 → Receipt → Bill  
+2. Sales → সানরাইজকে 15 → Delivery → Invoice  
 
-**Produce** চাপুন।
+Manufacturing লাগে না — খুচরা কেনা-বেচা।
 
-```
-Quantity:   500
-Lot:        SHIRT-2024-001
-```
-
-**Validate** চাপুন।
-
-এখন:
-```
-Raw Materials:  stock থেকে বের হয়ে গেল
-Finished Goods: stock-এ এলো 500 শার্ট
-```
+রহিম: “কম্বো বানাই যখন অ্যাসেম্বলি লাগে; সাধারণ চার্জার সরাসরি কিনি।”
 
 ---
 
-## ধাপ ১১ — Delivery করুন
+# দিন ৫ — কে কোন অ্যাপ খোলে (রোজকার)
 
-Sales Order-এ ফিরুন।
+| সময় | কে | অ্যাপ | কাজ |
+|---|---|---|---|
+| সকাল | সালমা | CRM / Sales | Lead, Quotation |
+| সকাল | জাবেদ | Inventory | Receipt / Delivery |
+| দুপুর | রফিক | Manufacturing | MO Produce |
+| দুপুর | সালমা | Purchase | RFQ যখন স্টক কম |
+| বিকেল | করিম | Invoicing | Invoice / Bill / Payment |
+| সন্ধ্যা | রহিম | Reporting | P&L, Pipeline, Stock |
 
-Delivery Order এখন **Ready** (stock আছে)।
-
-Validate করুন।
+একই Login এ সব মেনু — অধিকার ভাগ করলে প্রত্যেকে নিজের অ্যাপ দেখে।
 
 ---
 
-## ধাপ ১২ — Invoice ও Payment
+# মডিউল ম্যাপিং — এক পাতায়
 
-Sales Order → **Create Invoice** → Confirm → Payment নিন।
-
----
-
-## ধাপ ১৩ — পুরো Flow Database-এ
-
-```sql
--- নকশি টেক্সটাইলের একটা complete order trace
-SELECT
-    'CRM Lead' AS step,
-    cl.name AS reference,
-    cl.stage_id::text AS status
-FROM crm_lead cl
-WHERE cl.partner_id = (
-    SELECT id FROM res_partner WHERE name = 'Style House BD' LIMIT 1)
-
-UNION ALL
-
-SELECT
-    'Sales Order' AS step,
-    so.name,
-    so.state
-FROM sale_order so
-WHERE so.partner_id = (
-    SELECT id FROM res_partner WHERE name = 'Style House BD' LIMIT 1)
-
-UNION ALL
-
-SELECT
-    'Manufacturing Order' AS step,
-    mo.name,
-    mo.state
-FROM mrp_production mo
-ORDER BY mo.id DESC
-LIMIT 1
-
-UNION ALL
-
-SELECT
-    'Delivery' AS step,
-    sp.name,
-    sp.state
-FROM stock_picking sp
-WHERE sp.picking_type_code = 'outgoing'
-ORDER BY sp.id DESC
-LIMIT 1
-
-UNION ALL
-
-SELECT
-    'Invoice' AS step,
-    am.name,
-    am.state
-FROM account_move am
-WHERE am.move_type = 'out_invoice'
-ORDER BY am.id DESC
-LIMIT 1;
-```
-
-দেখবেন সম্পূর্ণ chain:
+| ব্যবসার কথা | Odoo অ্যাপ |
+|---|---|
+| মানুষ/দোকান | Contacts |
+| আগ্রহ/ডিল | CRM |
+| দরপত্র/অর্ডার | Sales |
+| সাপ্লায়ার অর্ডার | Purchase |
+| গুদাম/লট/তাক | Inventory |
+| অ্যাসেম্বলি | Manufacturing |
+| বিল/টাকা | Invoicing (+ Full Accounting Features) |
+| কর্মী তালিকা | Employees |
 
 ```
-step                 reference      status
-CRM Lead            Style House BD  won
-Sales Order         S00001          sale
-Manufacturing Order MO/001          done
-Delivery            WH/OUT/001      done
-Invoice             INV/2024/001    posted
+CRM Won ≠ টাকা এসেছে
+Sales Confirm ≠ মাল গেছে
+Purchase Confirm ≠ মাল এসেছে
+MO Done = তৈরি হয়ে স্টক বেড়েছে
+Delivery/Receipt Validate = স্টক বদল
+Invoice/Bill + Payment = টাকার খাতা
 ```
 
 ---
 
-## একটা সম্পূর্ণ Order-এ কোন কোন Table Update হয়
+# এক নজরে Full ERP চেকলিস্ট
 
 ```
-CRM:
-    crm_lead                → opportunity তৈরি ও win
-
-Sales:
-    sale_order              → quotation → confirmed
-    sale_order_line         → product lines
-
-Manufacturing:
-    mrp_production          → manufacturing order
-    mrp_workorder           → work orders (যদি থাকে)
-    stock_move              → raw material consumption
-    stock_move              → finished product production
-
-Purchase:
-    purchase_order          → raw material PO
-    purchase_order_line     → lines
-    stock_picking           → receipt
-    stock_move              → incoming movement
-
-Inventory:
-    stock_quant             → quantity changes (raw in, finished out)
-    stock_picking           → delivery
-    stock_move              → outgoing movement
-    stock_move_line         → serial number tracking
-
-Accounting:
-    account_move            → invoice (out_invoice)
-    account_move_line       → invoice lines
-    account_move            → vendor bills (in_invoice)
-    account_payment         → payments
+☐ DB rahim_full_erp — Demo OFF
+☐ সব Apps Install + Inventory/Purchase Settings
+☐ Contacts: Vendor + Customers
+☐ Employees: সালমা, জাবেদ, রফিক, করিম
+☐ Products + BOM
+☐ Purchase কাঁচামাল → Receipt → Bill
+☐ MO Combo 20 → Done
+☐ CRM Lead নূর টেক → Opportunity
+☐ SO Combo 10 → Delivery → Invoice → Payment → CRM Won
+☐ রহিম: Stock + P&L + Pipeline চেক
 ```
 
 ---
 
-## এই Part-এ যা শিখলেন
+## সমস্যা হলে
 
-```
-✓ CRM → Sales → Manufacturing → Purchase → Delivery → Invoice
-✓ সব module কীভাবে একে অপরের সাথে connected
-✓ একটা transaction-এ কতগুলো table update হয়
-✓ Odoo আসলে একটা integrated system — আলাদা আলাদা নয়
-```
+| সমস্যা | করণীয় |
+|---|---|
+| MO তে স্টক নেই | আগে Purchase Receipt |
+| Delivery আটকে | আগে MO Done বা Purchase স্টক |
+| Quotation এ Product নেই | Product Save + Can be Sold |
+| Invoice মেনু কম | Invoicing Install + Full Accounting Features |
+| কে কোন ধাপে জানি না | উপরের “কে কোন অ্যাপ” ছক |
 
 ---
 
-## আপনি এখন Odoo ERP বোঝেন
+## আলাদা পার্ট vs Full ERP
 
-```
-CRM        → Opportunity থেকে Sales শুরু
-Sales      → Order নেওয়া, Delivery ও Invoice
-Purchase   → কেনাকাটা, Receipt, Bill
-Inventory  → Stock management, Lot, Transfer
-Manufacturing → BOM, Production Order
-Accounting → Invoice, Bill, Payment, Reports
-HR         → Employee, Attendance, Leave
-```
+| আলাদা পার্ট | Full ERP (এই ফাইল) |
+|---|---|
+| এক মডিউল গভীর শেখা | সব মডিউল এক খাতায় জোড়া |
+| আলাদা DB চলতে পারে | **এক DB** — এক গল্প শেষ পর্যন্ত |
 
-প্রতিটা business-এর জন্য দরকারি module আলাদা।
-Odoo সেই flexibility দেয়।
+আগে আলাদা গাইড পড়ে নিন → এই ফাইলে একবারে প্র্যাকটিস করুন।
 
-এটাই ERP-র মূল কথা —
-**সব department একটা system-এ, একটা database-এ।**
+এই ফাইল দিন ১ → ৫।  
+রহিম ট্রেডার্সের পুরো ERP — Lead থেকে Payment পর্যন্ত এক লাইনে।
