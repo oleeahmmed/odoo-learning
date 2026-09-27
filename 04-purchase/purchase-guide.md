@@ -1,202 +1,209 @@
-# Purchase — সহজ গল্পে সম্পূর্ণ সেটআপ
-### রহিম ট্রেডার্স: Sales এর উল্টো দিক — কেনা → Receipt → Bill
+# Purchase — scratch থেকে সম্পূর্ণ সেটআপ
+### রহিম ট্রেডার্স: Login → Install → Settings প্রতিটা → Configuration → Orders
 
 ---
 
-## গল্প: অফিসে কে কে?
+## কে কে?
 
-| কে | ভূমিকা | Odoo তে কী করে |
-|---|---|---|
-| **রহিম ভাই** | মালিক | Settings, Agreement ধারণা |
-| **সালমা** | কেনাকাটা | RFQ / Purchase Order |
-| **জাবেদ** | স্টোর | Receipt Validate |
-| **করিম** | হিসাব | Vendor Bill / Payment |
-| **ঢাকা ইলেকট্রনিক্স** | Vendor | সাপ্লায়ার |
-| **Phone Charger 20W** | পণ্য | By Lots |
-
-```
-আগে: Contacts + Inventory (+ Sales)
-একই DB rahim_traders
-Demo ☐ OFF
-```
-
-Sales তুলনা:
-
-| Sales | Purchase |
+| কে | কাজ |
 |---|---|
-| Customer | Vendor |
-| Quotation / SO | RFQ / PO |
-| Delivery | Receipt |
-| Customer Invoice | Vendor Bill |
-
----
-
-## সোনার নিয়ম
+| **রহিম** | Settings ব্যাখ্যা + Save |
+| **সালমা** | RFQ / Confirm |
+| **জাবেদ** | Receipt |
+| **করিম** | Vendor Bill |
+| Vendor | Dhaka Electronics Ltd |
+| Product | Phone Charger 20W |
 
 ```
-১  Vendor + Product আগে
-২  Confirm Order = অটো Receipt (মাল এখনো ঢোকেনি)
-৩  Bill Control = Received quantities ভালো (মাল এলে বিল)
-৪  Warning টিক থাকলে Contact এ মেসেজ → PO তে Vendor বাছলে দেখায়
+Demo ☐ OFF | DB: rahim_purchase
+Apps: Contacts + Inventory + Purchase (+ Invoicing Bill এর জন্য)
 ```
 
 ---
 
-# দিন ১ — Purchase ইনস্টল + Settings (রহিম)
+# দিন ১ — Scratch Login + Install
+
+| Database Name | `rahim_purchase` |
+| Demo data | ☐ |
+| Email / Pass | admin@rahim.com / admin123 |
+| Country | Bangladesh |
+
+Company রহিম ট্রেডার্স + Timezone
 
 ```
-Apps → Purchase → Install
+Apps → Contacts → Inventory → Purchase → Invoicing → Install
 ```
 
-```
-Settings → Purchase
-```
-অথবা `Purchase → Configuration → Settings`
+Inventory Settings: ☑ Storage Locations | ☑ Lots → Save
 
-মিনিমাল টিক:
+মেনু Purchase:
+
+```
+Orders | Products | Reporting | Configuration
+```
+
+---
+
+# দিন ১ — Purchase Settings প্রতিটা (রহিম) → মিনিমাল Save
+
+```
+Purchase → Configuration → Settings
+```
+
+---
+
+## Orders
+
+### Purchase Order Approval
+
+টিক = বড় টাকায় ম্যানেজার Approve।  
+**মিনিমাল:** ☐ (শিখতে আটকাবে)
+
+### Lock Confirmed Orders
+
+টিক = Confirm পর এডিট বন্ধ।  
+**মিনিমাল:** ☐
+
+### Warnings
+
+টিক + Save → Contact এ Warning ঘর আসে।  
+Vendor এ মেসেজ লিখলে PO তে Vendor বাছলেই দেখায়।  
+
+**ডেমো:** ঢাকা ইলেকট্রনিক্স → Warning: `কোয়ালিটি চেক করুন`  
+
+**মিনিমাল:** ☑
+
+### Purchase Agreements
+
+টিক + Save → মেনু Agreements (Blanket/Tender)।  
+**মিনিমাল:** ☑ (মেনু দেখতে) — শিখতে আগে সাধারণ RFQই করুন।  
+Blanket = বছরের চুক্তি; ছোট PO পরে।
+
+### Receipt Reminder
+
+টিক = Vendor কে তারিখ রিমাইন্ডার।  
+**মিনিমাল:** ☐
+
+---
+
+## Invoicing
+
+### Bill Control
+
+| অপশন | মানে |
+|---|---|
+| Ordered quantities | অর্ডারের পুরো Qty বিল |
+| **Received quantities** | যে মাল Receipt হয়েছে তত বিল |
+
+**মিনিমাল:** ○ **Received quantities**
+
+### 3-way matching
+
+Enterprise — Community তে না থাকলে স্কিপ।
+
+---
+
+## Products
+
+| Variants / Grid / Packagings / UoM | মিনিমাল ☐ |
+|---|---|
+
+→ **Save**
+
+### মিনিমাল সেট সারাংশ
 
 ```
 ☑ Warnings
 ☑ Purchase Agreements
-```
-
-Bill Control থাকলে: **Received quantities**
-
-→ **Save**
-
----
-
-## Warnings — কেন টিক? (রহিম সালমাকে)
-
-টিক + Save না থাকলে Contact এ Warning ঘর আসে না।
-
-```
-Contacts → Dhaka Electronics Ltd
-```
-
-Warning on Purchase Order → মেসেজ:
-
-```
-MD স্যার: কোয়ালিটি চেক করে তারপর অর্ডার করুন
-```
-
+○ Bill Control = Received quantities
+☐ Approval, Lock, Reminder, Variants…
 → Save
-
-এখন PO তে Vendor বাছলেই সতর্কবার্তা — ভুলে খারাপ অর্ডার কম।
-
-**শুধু Done/টিক এর লাভ:** মানুষকে সাবধান করা। উদ্দেশ্য না বুঝে টিক নয়।
+```
 
 ---
 
-## Blanket Order — কখন? (রহিম সংক্ষেপ)
+# দিন ১ — Configuration মেনু ধরে
 
-সাধারণ RFQ = আজকের এক কেনা।
-
-**Blanket** = সারা বছরের ওয়াদা (যেমন ৬০০ পিস @ ২২০) — মাল এখনই আসে না।  
-পরে ছোট PO কেটে Receipt।
-
-মেনু (টিক থাকলে): `Purchase → Orders → Purchase Agreements`
-
-শিখতে আগে সাধারণ RFQই করুন। Blanket দরকার হলে চুক্তি বানিয়ে পরে ছোট PO।
-
----
-
-# দিন ২ — RFQ (সালমা)
-
-**গল্প:** স্টক কম — ঢাকা ইলেকট্রনিক্সকে ৫০ পিস অর্ডার।
-
-```
-Purchase → Orders → Requests for Quotation → New
-```
-
-| Field | ডেমো মান |
+| মেনু | কী করবেন |
 |---|---|
-| Vendor | Dhaka Electronics Ltd |
-| Product | Phone Charger 20W |
-| Quantity | 50 |
-| Unit Price | 220 |
-
-Vendor বাছলে Warning দেখা যেতে পারে → OK বুঝে এগোবেন।
-
-→ **Save** (RFQ)
+| Settings | উপরেই |
+| Purchase Agreements | লিস্ট দেখুন; Blanket পরে |
+| Products | Inventory এর সাথে শেয়ার |
+| Vendor Pricelists | স্কিপ |
+| Tags | ঐচ্ছিক |
 
 ---
 
-# দিন ২ — Confirm Order (সালমা)
+# দিন ২ — মাস্টার Scratch
 
-→ **Confirm Order**
-
-```
-RFQ → Purchase Order
-Confirm = অটো Receipt তৈরি
-মাল এখনো গুদামে ঢোকেনি
-```
-
-**জাবেদ কী দেখবে:** Inventory → Receipts এ নতুন ডকুমেন্ট।
+Contacts: Dhaka Electronics Ltd + Warning মেসেজ  
+Product: Phone Charger 20W Storable By Lots Cost 220  
+Locations: Stock Parent=WH
 
 ---
 
-# দিন ৩ — Receipt (জাবেদ)
+# দিন ২–৩ — Orders মেনু ধরে
 
-PO → **Receipt** বাটন
+## Requests for Quotation
 
-1. Mark as Todo  
-2. ≡ এ Lot `CH-002`, Qty 50, To Tak-1 বা Stock  
-3. **Validate** → Done  
+New → Vendor ঢাকা… (Warning দেখা যেতে পারে) → Product Qty 50 Price 220 → Save
 
-On Hand +৫০।
+## Confirm Order
 
-```
-সালমা Confirm ≠ মাল ঢোকা
-জাবেদ Validate = মাল ঢোকা
-```
+Confirm → PO  
+**অটো Receipt** তৈরি — মাল এখনো ঢোকেনি।
 
-আংশিক এলে Qty কম + Create Backorder (Sales advanced এর মতো গল্প)।
+## Purchase Orders লিস্ট
 
----
+Confirmed PO এখানে।
 
-# দিন ৩ বিকেল — Vendor Bill (করিম)
+## Agreements (ঐচ্ছিক)
 
-PO → **Create Bill** → Confirm  
-→ Register Payment (টাকা দিলে)
-
-```
-Customer Invoice = পাব
-Vendor Bill = দেব
-```
-
-Received quantities থাকলে মাল যত এসেছে তত বিল সহজ।
+Blanket: Vendor + Product Qty 600 @ 220 → পরে ছোট PO।  
+প্রথম প্র্যাকটিসে স্কিপ করতে পারেন।
 
 ---
 
-# কে কখন কোন মেনু
+# দিন ৩ — Receipt (জাবেদ) + Bill (করিম)
 
-| মেনু | সালমা | জাবেদ | করিম | রহিম |
+PO → Receipt → Todo → ≡ Lot CH-001 Qty 50 → Validate  
+
+PO → Create Bill → Confirm → Payment ঐচ্ছিক  
+
+```
+Confirm ≠ মাল ঢোকা
+Receipt Validate = স্টক +
+Bill = Vendor কে দেয় টাকার খাতা
+```
+
+---
+
+# Products / Reporting মেনু
+
+Products = পণ্য।  
+Reporting = Purchase analysis।
+
+---
+
+# কে কোন মেনু
+
+| মেনু | রহিম | সালমা | জাবেদ | করিম |
 |---|---|---|---|---|
-| RFQ / PO | ✅ | — | — | Settings/Warning |
-| Receipt | — | ✅ | — | — |
-| Create Bill | — | — | ✅ | — |
-| Agreements | কদাচিৎ | — | — | বুঝিয়ে দেয় |
+| Settings | ✅ | — | — | — |
+| RFQ/PO | — | ✅ | — | — |
+| Receipt | — | — | ✅ | — |
+| Bill | — | — | — | ✅ |
+| Agreements | ব্যাখ্যা | কদাচিৎ | — | — |
 
 ---
 
 # এক নজরে
 
 ```
-১  Purchase Install
-২  Warnings + Agreements ☑ → Contact এ Warning
-৩  RFQ (ঢাকা ইলেকট্রনিক্স + চার্জার ৫০)
-৪  Confirm → অটো Receipt
-৫  Receipt + Lot → Validate
-৬  Create Bill → Confirm
+১  DB + Apps Install
+২  Settings: Warnings + Agreements + Received quantities
+৩  Vendor + Warning টেক্সট + Product
+৪  RFQ → Confirm → Receipt → Bill
 ```
 
-## সমস্যা হলে
-
-| সমস্যা | করণীয় |
-|---|---|
-| Warning ঘর নেই | Settings এ Warnings ☑ + Save |
-| Receipt বাটন নেই | Confirm Order + Inventory |
-| Bill+Pay করেও Receipt বাকি | Validate আলাদা করতে হয় |
-
-পরের পার্ট **Accounting**: Invoice/Bill এর টাকা ও রিপোর্ট — আলাদা গাইডে বিস্তারিত।
+পরের পার্ট Accounting / Manufacturing — নিজ নিজ scratch গাইড।

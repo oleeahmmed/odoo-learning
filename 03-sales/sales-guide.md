@@ -1,202 +1,196 @@
-# Sales — সহজ গল্পে সম্পূর্ণ সেটআপ
-### রহিম ট্রেডার্স: Inventory এর পর বিক্রি → Delivery → Invoice
+# Sales — scratch থেকে সম্পূর্ণ সেটআপ
+### রহিম ট্রেডার্স: Login → Install → Settings → Configuration → Orders মেনু ধরে
 
 ---
 
-## গল্প: অফিসে কে কে?
+## কে কে?
 
-| কে | ভূমিকা | Odoo তে কী করে |
-|---|---|---|
-| **রহিম ভাই** | মালিক | Settings, রিপোর্ট |
-| **সালমা** | সেলস | Quotation / Order |
-| **জাবেদ** | স্টোর | Delivery Validate |
-| **করিম** | হিসাব | Invoice / Payment (Accounting পার্টে বিস্তার) |
-| **সানরাইজ স্টোর** | Customer | ক্রেতা |
-| **Phone Charger 20W** | পণ্য | স্টক থাকতে হবে |
-
-```
-আগে: Contacts + Inventory (স্টক > ০)
-একই DB rahim_traders
-Demo ☐ OFF
-```
-
----
-
-## সোনার নিয়ম
+| কে | কাজ |
+|---|---|
+| **রহিম** | Settings / Configuration |
+| **সালমা** | Quotation / Confirm / Invoice |
+| **জাবেদ** | Delivery Validate |
+| Customer | সানরাইজ স্টোর |
+| Product | Phone Charger 20W |
 
 ```
-১  Customer ও Product আগে থাকতে হবে
-২  Confirm = অটো Delivery তৈরি (মাল এখনো বের হয়নি)
-৩  Invoice/Payment ≠ Delivery Done
-৪  Return = Delivery Done এর পর + Credit Note
+Demo ☐ OFF | DB: rahim_sales
+Apps: Contacts + Inventory + Sales
+স্টক ছাড়া Delivery আটকাবে — এই গাইডে ছোট Receiptও আছে
 ```
 
 ---
 
-# দিন ১ — Sales ইনস্টল (রহিম)
+# দিন ১ — Scratch Login + Install
+
+| Field | মান |
+|---|---|
+| Database Name | `rahim_sales` |
+| Email | `admin@rahim.com` |
+| Password | `admin123` |
+| Country | Bangladesh |
+| Demo data | ☐ |
+
+Company রহিম ট্রেডার্স + Timezone Asia/Dhaka
 
 ```
-Apps → Sales → Install
+Apps → Contacts → Inventory → Sales → Install
 ```
 
+Inventory Settings মিনিমাল:
+
 ```
-Sales → Configuration → Settings → Save
+☑ Storage Locations | ☑ Lots & Serial Numbers → Save
 ```
 
-(অতিরিক্ত টিক এখন কম রাখুন।)
-
-মেনু:
+মেনু Sales:
 
 ```
 Orders | To Invoice | Products | Reporting | Configuration
 ```
 
-**সালমা পরে কী দেখবে:** Orders → Quotations।
-
 ---
 
-# দিন ১ বিকেল — Contacts vs Sales Customer (রহিম শেখায়)
-
-সালমা: “Contacts এও সানরাইজ, Sales এও Customer — দুটো কি আলাদা?”
-
-রহিম: “না। একটাই Contact। Sales শুধু সেই খাতা থেকে বাছে।”
+# দিন ১ — Sales Settings (রহিম) প্রতিটা বুঝে মিনিমাল
 
 ```
-Contacts = মূল খাতা
-Sales Customer ঘর = একই রেকর্ড
+Sales → Configuration → Settings
 ```
 
----
-
-# দিন ২ — Quotation (সালমা)
-
-**গল্প:** সানরাইজ ফোন — চার্জার ১০ পিস দর চাই।
-
-স্টক আছে তো? জাবেদ বলল On Hand যথেষ্ট।
-
-```
-Sales → Orders → Quotations → New
-```
-
-| Field | ডেমো মান |
-|---|---|
-| Customer | সানরাইজ স্টোর |
-| Product | Phone Charger 20W |
-| Quantity | 10 |
-| Unit Price | 350 |
-| Warehouse | আপনার WH (থাকলে) |
-
-→ **Save**
-
-স্ট্যাটাস Quotation — এখনো স্টক কাটেনি।
-
----
-
-# দিন ২ — Confirm (সালমা)
-
-কাস্টমার রাজি → **Confirm**
-
-```
-Quotation → Sales Order
-```
-
-```
-Confirm = Odoo অটো একটা Delivery বানিয়ে রাখে
-মাল এখনো বের হয়নি — Validate বাকি
-```
-
-উপরে **Delivery** বাটন দেখা যাবে।
-
-**জাবেদ কী দেখবে:** Inventory → Delivery Orders এ নতুন ডকুমেন্ট।
-
----
-
-# দিন ৩ — Delivery (জাবেদ)
-
-Sales Order → **Delivery**  
-অথবা Inventory → Delivery Orders
-
-1. Mark as Todo (লাগলে)  
-2. ≡ এ Lot `CH-001`, Qty 10  
-3. **Validate** → Done  
-
-On Hand ১০ কমে।
-
-```
-সালমা Confirm করেছে ≠ মাল গেছে
-জাবেদ Validate = মাল গেছে
-```
-
----
-
-# দিন ৩ বিকেল — Invoice (সালমা / করিম)
-
-Sales Order → **Create Invoice**
-
-পপআপে তিনটা অপশন:
-
-| অপশন | মানে | এখন |
+| অপশন | মিনিমাল | টিক দিলে কী হয় / কোথায় |
 |---|---|---|
-| **Regular invoice** | সাধারণ বিল | ✅ এটা বাছুন |
-| Down payment (percentage) | % অগ্রিম | পরে |
-| Down payment (fixed amount) | ফিক্সড অগ্রিম | পরে |
+| Variants | ☐ | Product এ Attribute |
+| Discounts | ☑ চাইলে | SO লাইনে Disc% |
+| Lock Confirmed Sales | ☐ শিখতে | Confirm পর এডিট বন্ধ |
+| Quotation Templates | ☐ | টেমপ্লেট মেনু |
+| Online Signature / Payment | ☐ | কাস্টমার পোর্টাল |
+| Delivery Methods | ☐ | শিপিং মেথড |
+| Coupons / Loyalty | ☐ | প্রমো |
+| Margins | ☐ | মার্জিন কলাম |
+| Pricelists | ☐ | একাধিক দাম তালিকা |
+| Customer Addresses | ☑ ডিফল্ট | Invoice/Delivery ঠিকানা |
 
-→ Create → **Confirm**
-
-ঐচ্ছিক: **Register Payment**
+**মিনিমাল Save:**
 
 ```
-Invoice/Payment করেও Delivery বাকি থাকতে পারে
-টাকা ≠ মাল বের হওয়া
+☐ Lock Confirmed Sales
+☑ Discounts (ঐচ্ছিক)
+বাকি জটিল ☐
+→ Save
+```
+
+Product Invoicing Policy (পণ্যে):
+
+```
+Ordered quantities = অর্ডারের বিল
+Delivered quantities = ডেলিভারি যত তত বিল (ফিজিক্যালে ভালো)
+```
+
+Charger এ পরে **Delivered quantities** সেট করুন।
+
+---
+
+# দিন ১ — Configuration মেনু ধরে
+
+```
+Sales → Configuration
+```
+
+| মেনু | এখন কী করবেন | পরে কোথায় লাগে |
+|---|---|---|
+| Settings | উপরেই | — |
+| Sales Teams | New: `রহিম সেলস` (ঐচ্ছিক) | SO এ Team |
+| Activity Types | ডিফল্ট | ফলোআপ |
+| Tags | New: Hot Deal (ঐচ্ছিক) | SO ট্যাগ |
+| Payment Terms | New: 15 Days | SO/Invoice Due |
+| Quotation Templates | স্কিপ | — |
+| Product Categories | স্কিপ | — |
+
+**মিনিমাল:** Payment Terms `15 Days` একটা বানান → Save
+
+---
+
+# দিন ২ — মাস্টার (Scratch হাতে)
+
+**Contacts:** সানরাইজ স্টোর (Company), Dhaka Electronics Ltd  
+
+**Product:** Phone Charger 20W | Storable | By Lots | Price 350 | Invoicing Policy Delivered  
+
+**স্টক:** Inventory → Receipt → Vendor ঢাকা… → Qty 50 Lot CH-001 → Validate  
+
+```
+Customer + Product + Stock আগে → তারপর Quotation
 ```
 
 ---
 
-# দিন ৪ — Return সহজ (জাবেদ + করিম)
+# দিন ২ — Orders মেনু ধরে
 
-সানরাইজ ২ পিস ফেরত:
+## Quotations
 
-1. Delivery Done → **Return** → Qty 2 → Lot → Validate  
-2. Invoice → **Credit Note** → Qty 2 → Confirm  
+New → Customer সানরাইজ → Product Qty 10 → Payment Terms 15 Days → Save  
 
-```
-Return = মাল ফিরে
-Credit Note = বিল কমে
-দুটোই লাগে
-```
+## Confirm
 
-জটিল কেস (backorder, আংশিক): `sales-advanced-guide.md`
+Confirm → Sales Order  
+**অটো Delivery** তৈরি — মাল এখনো বের হয়নি।
+
+## Orders (Sales Orders লিস্ট)
+
+Confirmed অর্ডার এখানে।
 
 ---
 
-# কে কখন কোন মেনু
+# দিন ৩ — Delivery (জাবেদ) + To Invoice
 
-| মেনু | সালমা | জাবেদ | রহিম |
+SO → Delivery → Todo → ≡ Lot CH-001 Qty 10 → Validate  
+
+## To Invoice মেনু
+
+বিল কাটার অপেক্ষা লিস্ট।  
+SO → Create Invoice → **Regular invoice** (Down payment %/fixed এখন নয়) → Confirm  
+
+Register Payment ঐচ্ছিক।
+
+```
+Regular = সাধারণ বিল
+Down payment = অগ্রিম — শিখতে পরে
+```
+
+---
+
+# দিন ৩ — Products / Reporting মেনু
+
+Products = একই পণ্য তালিকা।  
+Reporting = Sales analysis (ডাটা থাকলে)।
+
+---
+
+# Customers vs Contacts
+
+একই `res.partner`। Sales Customer ঘর = Contacts এর নাম।
+
+---
+
+# কে কোন মেনু
+
+| মেনু | রহিম | সালমা | জাবেদ |
 |---|---|---|---|
-| Quotations / Orders | ✅ রোজ | — | দেখে |
-| Delivery | বাটন দেখে | ✅ Validate | — |
-| Create Invoice | ✅ | — | — |
-| Reporting | — | — | ✅ |
+| Settings / Payment Terms | ✅ | — | — |
+| Quotations / Orders | — | ✅ | — |
+| Delivery | — | — | ✅ |
+| Create Invoice | — | ✅ | — |
 
 ---
 
 # এক নজরে
 
 ```
-১  Sales Install
-২  Quotation (সানরাইজ + চার্জার ১০)
-৩  Confirm → অটো Delivery
-৪  Delivery Validate + Lot
-৫  Create Invoice → Regular → Confirm
-৬  (ঐচ্ছিক) Return + Credit Note
+১  DB + Contacts + Inventory + Sales
+২  Sales Settings মিনিমাল Save
+৩  Payment Terms 15 Days
+৪  Customer + Product + Receipt স্টক
+৫  Quotation → Confirm → Delivery → Regular Invoice
 ```
 
-## সমস্যা হলে
-
-| সমস্যা | করণীয় |
-|---|---|
-| Delivery Validate স্টক নেই | আগে Inventory Receipt |
-| Customer খালি | Contacts এ সানরাইজ |
-| Invoice+Pay করেও Delivery দেখায় | স্বাভাবিক — Validate/Cancel করুন |
-
-পরের পার্ট **Purchase**: ঢাকা ইলেকট্রনিক্স থেকে কেনা।
+পরের পার্ট **Purchase** scratch।

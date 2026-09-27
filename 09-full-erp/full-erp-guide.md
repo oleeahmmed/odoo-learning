@@ -66,42 +66,61 @@ Company: **রহিম ট্রেডার্স** → Timezone Asia/Dhaka �
 
 ---
 
-# দিন ১ দুপুর — সব Apps একসাথে (রহিম)
+# দিন ১ দুপুর — সব Apps + প্রতিটার মিনিমাল Settings (রহিম)
 
 ```
-Apps → একটা একটা Install:
+Apps → Install:
+Contacts | CRM | Sales | Purchase | Inventory | Manufacturing | Invoicing | Employees
 ```
 
+Install এর **পরই** Settings — এড়িয়ে যাবেন না।
+
+### Inventory Settings
 ```
-☑ Contacts
-☑ CRM
-☑ Sales
-☑ Purchase
-☑ Inventory
-☑ Manufacturing
-☑ Invoicing
-☑ Employees   (HR বেসিক)
+☑ Storage Locations | ☑ Lots & Serial Numbers | ☑ Multi-Step Routes → Save
+Stock Parent = WH | Tak-1 বানান
 ```
 
-Accounting মেনু বেশি চাইলে: Developer mode → Groups → **Show Full Accounting Features** → admin Add।
-
-Inventory Settings:
-
+### Sales Settings
 ```
-☑ Storage Locations
-☑ Lots & Serial Numbers
+☐ Lock Confirmed Sales
+Payment Terms: New 15 Days
+Product Invoicing Policy: Delivered quantities (ফিজিক্যাল)
 → Save
 ```
 
-Purchase Settings (মিনিমাল):
-
+### Purchase Settings
 ```
-☑ Warnings
-Bill Control: Received quantities
+☑ Warnings | ☑ Purchase Agreements
+○ Bill Control = Received quantities
+☐ Approval | ☐ Lock
 → Save
+Contact Vendor এ Warning টেক্সট
 ```
 
-রহিম: “সব অ্যাপ লাগল — এখন খাতার মানুষ ও মাল।”
+### Manufacturing Settings
+```
+Work Orders ☐ (মিনিমাল) → Save
+```
+
+### CRM Settings
+```
+☑ Leads → Save
+Lost Reason: Too expensive
+```
+
+### Invoicing / Accounting
+```
+Show Full Accounting Features (Groups)
+Dashboard: Periods | Bank ম্যানুয়াল | Taxes Done | CoA তে Income/Expense খাতা
+```
+
+### Employees Settings
+```
+ডিফল্ট Save | Departments + Jobs | Employee কার্ড
+```
+
+রহিম: “প্রতি অ্যাপ Install → সাথে সাথে Settings মিনিমাল — তারপর মাস্টার ডাটা।”
 
 ---
 

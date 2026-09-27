@@ -1,406 +1,148 @@
-# Manufacturing — সহজ গল্পে সম্পূর্ণ সেটআপ
-### রহিম ট্রেডার্স: scratch থেকে Login → কাঁচামাল → BOM → তৈরি → স্টক
+# Manufacturing — scratch থেকে সম্পূর্ণ সেটআপ
+### রহিম ট্রেডার্স: Login → Install → Settings → Configuration → BOM → MO
 
 ---
 
-## গল্প: অফিসে কে কে?
+## কে কে?
 
-| কে | ভূমিকা | Odoo তে কী করে |
-|---|---|---|
-| **রহিম ভাই** | মালিক | Apps, Settings, BOM সেট করে |
-| **রফিক** | প্রোডাকশন কর্মী | Manufacturing Order চালায়, Produce করে |
-| **জাবেদ** | স্টোরকিপার | কাঁচামাল Receipt, তৈরি মাল On Hand চেক |
-| **ঢাকা ইলেকট্রনিক্স** | Vendor | কাঁচামাল কেনা |
-| **সানরাইজ স্টোর** | Customer | পরে তৈরি পণ্য বিক্রি (Sales) |
-
-রহিম ভাই শুধু চার্জার কেনা-বেচা নন — এখন **ছোট অ্যাসেম্বলি** করেন:
-
-```
-কাঁচামাল:  USB Cable 1m  +  Plastic Case
-তৈরি পণ্য: Charger Combo Pack
-```
-
-একটা Combo Pack বানাতে লাগে: কেবল ১টা + কেস ১টা।
-
-আপনি প্রথমে **রহিম (Admin)** হয়ে সেটআপ করবেন।  
-পরে **রফিক** রোজ Manufacturing Order চালাবে।
-
-```
-Demo data ☐ OFF — সব হাতে বানাব
-অ্যাপ = Manufacturing + Inventory (+ Contacts)
-আগে Contacts/Inventory জানা থাকলে একই DB চলতে পারে
-অথবা নতুন DB: rahim_manufacturing
-```
-
----
-
-## সোনার নিয়ম
-
-```
-১  কাঁচামাল Product আগে → স্টক আগে (Receipt)
-২  তৈরি পণ্য Product আগে → তারপর BOM
-৩  BOM ছাড়া Manufacturing Order পূর্ণ হয় না
-৪  কাঁচামাল স্টক না থাকলে Produce আটকে যায়
-৫  Produce Done = কাঁচামাল কমে + তৈরি পণ্য বাড়ে
-```
-
----
-
-# দিন ১ সকাল — খাতা খোলা (রহিম)
-
-## ১) Database
-
-নতুন করে শিখতে:
-
-```
-http://localhost:8069/web/database/manager
-```
-
-| Field | মান |
+| কে | কাজ |
 |---|---|
-| Database Name | `rahim_manufacturing` |
-| Email | `admin@rahim.com` |
-| Password | `admin123` |
-| Country | Bangladesh |
-| Demo data | ☐ খালি |
-
-Create → Login
-
-(আগের `rahim_traders` চালাতে চাইলে সেখানেই Manufacturing Install করুন — ডেমো নাম একই রাখুন।)
-
-## ২) Company
+| **রহিম** | Settings + BOM |
+| **রফিক** | Manufacturing Orders + Produce |
+| **জাবেদ** | কাঁচামাল Receipt |
+| Vendor | Dhaka Electronics Ltd |
+| কাঁচামাল | USB Cable 1m, Plastic Case |
+| তৈরি | Charger Combo Pack |
 
 ```
-Settings → Companies → রহিম ট্রেডার্স → Save
-Preferences → Timezone: Asia/Dhaka → Save
+Demo ☐ OFF | DB: rahim_manufacturing
+Apps: Contacts + Inventory + Manufacturing + Purchase
 ```
-
-রহিম: “এখন কারখানার মডিউল লাগাই।”
 
 ---
 
-# দিন ১ দুপুর — Apps ইনস্টল (রহিম)
+# দিন ১ — Scratch Login + Install
+
+| Database | `rahim_manufacturing` | Demo ☐ |
+| Email | admin@rahim.com / admin123 | Country BD |
+
+Company রহিম ট্রেডার্স + Timezone
 
 ```
-Apps → Contacts → Install
-Apps → Inventory → Install
-Apps → Manufacturing → Install
+Apps → Contacts → Inventory → Purchase → Manufacturing → Install
 ```
 
-চাইলে Purchaseও Install — কাঁচামাল Receipt সহজ হয়।
+Inventory Settings মিনিমাল: ☑ Storage Locations → Save  
+Stock Parent = WH
 
-উপরে **Manufacturing** মেনু এলে OK।
+মেনু Manufacturing:
 
 ```
-Inventory → Configuration → Settings
-☑ Storage Locations
-☑ Lots & Serial Numbers   (ঐচ্ছিক — শিখতে পরে)
-→ Save
+Operations | Planning | Products | Reporting | Configuration
 ```
 
-Manufacturing Settings:
+---
+
+# দিন ১ — Manufacturing Settings (রহিম)
 
 ```
 Manufacturing → Configuration → Settings
 ```
 
-শিখতে মিনিমাল রাখুন। Work Orders টিক না দিলেও সাধারণ Produce চলে।  
-(Work Orders = প্রতি ধাপ আলাদা — পরে।)
+| অপশন | মিনিমাল | টিক দিলে কী / কোথায় |
+|---|---|---|
+| Work Orders | ☐ | প্রতি ধাপ আলাদা WO — শিখতে জটিল |
+| Work Order Dependencies | ☐ | WO ক্রম |
+| By-Products | ☐ | উপজাত পণ্য |
+| Quality Control | ☐ (Enterprise/অ্যাডঅন হতে পারে) | কোয়ালিটি চেক |
+| Subcontracting | ☐ | বাইরে বানানো |
+| Master Production Schedule | ☐ | প্ল্যানিং স্ক্রিন |
+| Security Lead Time | 0 | অগ্রিম দিন |
 
-→ **Save**
+**মিনিমাল:** সব ☐ → **Save** (সাধারণ Produce যথেষ্ট)
 
-**রফিক পরে কী দেখবে:** Manufacturing → Operations → Manufacturing Orders।
-
----
-
-# দিন ১ বিকেল — Contact + Warehouse চেক (রহিম)
-
-## Vendor
-
-```
-Contacts → New → Company
-Name: Dhaka Electronics Ltd → Save
-```
-
-## Location
-
-```
-Inventory → Configuration → Locations
-```
-
-Stock এর Parent = **WH** আছে কিনা দেখুন (`WH/Stock`)।  
-চাইলে Tak-1 বানান (Parent = Stock) — তৈরি মাল সেখানে রাখতে।
+Work Orders ☑ করলে: Configuration এ Work Centers লাগে — এখন স্কিপ।
 
 ---
 
-# দিন ২ সকাল — তিনটা পণ্য বানান (রহিম) — আগে Product, পরে BOM
+# দিন ১ — Configuration মেনু ধরে
 
-রহিম: “BOM এ পণ্য বাছব — আগে পণ্য না থাকলে বাছব কী?”
-
-```
-Inventory → Products → Products → New
-```
-
----
-
-## পণ্য A — কাঁচামাল: USB Cable 1m
-
-| Field | ডেমো মান |
+| মেনু | কী করবেন |
 |---|---|
-| Name | USB Cable 1m |
-| Product Type | **Storable Product** |
-| Cost | 70 |
-| Sales Price | 120 |
-| Can be Purchased | ☑ |
-| Can be Sold | ☑ (আলাদাও বেচতে পারেন) |
-
-→ **Save**
+| Settings | উপরে মিনিমাল |
+| Work Centers | Work Orders চালু না হলে স্কিপ |
+| Operations | ডিফল্ট; এডিট নয় |
+| Bill of Materials | পরে Product এর পর বানাব |
+| Unbuild Orders | স্কিপ (ভাঙা) |
+| Scrap | স্কিপ |
 
 ---
 
-## পণ্য B — কাঁচামাল: Plastic Case
+# দিন ২ — Products মেনু (আগে Product, পরে BOM)
 
-| Field | ডেমো মান |
-|---|---|
-| Name | Plastic Case |
-| Product Type | **Storable Product** |
-| Cost | 40 |
-| Can be Purchased | ☑ |
-| Can be Sold | ☐ |
+| Product | Type | Cost | Sold/Purchased |
+|---|---|---|---|
+| USB Cable 1m | Storable | 70 | Purchased ☑ |
+| Plastic Case | Storable | 40 | Purchased ☑ |
+| Charger Combo Pack | Storable | 110 | Sold ☑ Purchased ☐ |
 
-→ **Save**
+Routes এ Manufacture থাকলে Combo তে ☑।
 
 ---
 
-## পণ্য C — তৈরি জিনিস: Charger Combo Pack
+# দিন ২ — কাঁচামাল স্টক (জাবেদ) আগে
 
-| Field | ডেমো মান |
-|---|---|
-| Name | Charger Combo Pack |
-| Product Type | **Storable Product** |
-| Sales Price | 450 |
-| Cost | 110 (আন্দাজ) |
-| Can be Sold | ☑ |
-| Can be Purchased | ☐ |
-
-→ **Save**
-
-Inventory ট্যাবে Routes থাকলে **Manufacture** ☑ করতে হতে পারে (Settings অনুযায়ী)।  
-না দেখলে পরে BOM Save করলেও অনেক সময় চলে।
+Purchase/Receipt: Cable 100 + Case 100 → Validate  
 
 ```
-এখনও BOM নেই — শুধু তিনটা Product কার্ড
-স্টকও এখনো ০
+স্টক আগে → BOM/MO পরে
 ```
 
 ---
 
-# দিন ২ দুপুর — কাঁচামাল স্টকে আনুন (জাবেদ)
-
-রফিক Produce করতে গেলে স্টক না থাকলে আটকে যাবে। তাই আগে মাল ঢোকান।
-
-```
-Inventory → Operations → Receipts → New
-```
-
-| Field | মান |
-|---|---|
-| Receive From | Dhaka Electronics Ltd |
-
-দুই লাইন:
-
-| Product | Demand |
-|---|---|
-| USB Cable 1m | 100 |
-| Plastic Case | 100 |
-
-→ Mark as Todo → Quantity ভরুন → **Validate**
-
-**জাবেদ কী দেখবে:** দুটো পণ্যে On Hand ≈ 100।  
-**Charger Combo Pack** এখনো ০ — এখনো তৈরি হয়নি।
-
-```
-Receipt আগে → তারপর Manufacturing
-```
-
----
-
-# দিন ২ বিকেল — BOM বানান (রহিম) — Product এর পর
+# দিন ২ — BOM (Products / Configuration)
 
 ```
 Manufacturing → Products → Bills of Materials → New
 ```
 
-অথবা: Charger Combo Pack খুলে → Bill of Materials।
-
-| Field | ডেমো মান |
-|---|---|
-| Product | **Charger Combo Pack** |
-| Quantity | 1.00 (১টা প্যাক বানাতে) |
-| BOM Type | Manufacture this product |
-
-Components ট্যাব / লাইন:
-
-| Component | Quantity |
-|---|---|
-| USB Cable 1m | 1 |
-| Plastic Case | 1 |
-
-→ **Save**
-
-**গল্প:** “১টা Combo Pack = ১ কেবল + ১ কেস।”
-
-**রফিক পরে কী দেখবে:** Manufacturing Order এ এই BOM অটো লাগবে।
-
-```
-BOM না বানিয়ে MO তে গেলে কম্পোনেন্ট খালি/error
-সিরিয়াল: Product → স্টক → BOM → তারপর Order
-```
-
----
-
-# দিন ৩ — Manufacturing Order (রফিক)
-
-**গল্প:** সানরাইজকে ১০টা Combo Pack লাগবে — আগে তৈরি করি।
-
-```
-Manufacturing → Operations → Manufacturing Orders → New
-```
-
-| Field | ডেমো মান |
+| Field | মান |
 |---|---|
 | Product | Charger Combo Pack |
-| Quantity | 10 |
+| Qty | 1 |
+| Components | Cable 1 + Case 1 |
 
-BOM অটো আসবে (একটাই থাকলে)।  
-Components এ দেখাবে: Cable 10 + Case 10।
-
-→ **Confirm**
-
-স্ট্যাটাস Confirmed / Waiting ইত্যাদি।
-
-→ **Check Availability** (বাটন থাকলে)
-
-কাঁচামাল যথেষ্ট থাকলে Ready / Available।
-
-**রফিক কী দেখবে:** কোন কম্পোনেন্ট কম আছে কিনা লাল/সতর্কবার্তা।  
-কম থাকলে জাবেদকে আবার Receipt করতে বলবেন — Produce আগে নয়।
+→ Save
 
 ---
 
-# দিন ৩ বিকেল — Produce / Mark as Done (রফিক)
+# দিন ৩ — Operations মেনু
 
-MO খোলা:
+## Manufacturing Orders
 
-→ **Produce** অথবা **Mark as Done** / Validate (স্ক্রিনে যে বাটন)
+New → Combo Qty 10 → Confirm → Check Availability → Produce/Done  
 
-Qty 10 ঠিক আছে কিনা দেখে Confirm।
+**পরে:** Combo On Hand +10; কাঁচামাল −10 করে।
 
-### Done এর পর কোথায় কী বদলায়
+## Planning / Unbuild / Scrap
 
-| জায়গা | আগে | পরে |
-|---|---|---|
-| USB Cable On Hand | 100 | ≈ 90 |
-| Plastic Case On Hand | 100 | ≈ 90 |
-| Charger Combo Pack On Hand | 0 | ≈ **10** |
-| Manufacturing Order | In Progress | **Done** |
-
-**রহিম কী দেখবে:** Products এ Combo Pack স্টক এসেছে — এখন Sales এ বিক্রি করা যায়।
-
-```
-Produce Done = কারখানা শেষ
-কাঁচামাল কমে + তৈরি পণ্য বাড়ে
-```
+শিখতে পরে।
 
 ---
 
-# দিন ৪ — তৈরি পণ্য বিক্রি (ঐচ্ছিক লিংক)
+# Reporting মেনু
 
-স্টক আছে বলে সালমা Sales এ:
-
-```
-Quotation → Customer সানরাইজ → Product Charger Combo Pack Qty 5 → Confirm → Delivery
-```
-
-Inventory পার্টের মতো Delivery Validate।
-
-এটা Manufacturing এর পরের ধাপ — শুধু বোঝার জন্য।
+Production analysis — ডাটা থাকলে।
 
 ---
 
-# দিন ৫ — রহিম রিপোর্ট / চেক
+# এক নজরে
 
 ```
-Inventory → Reporting → Stock
-Manufacturing → Reporting (থাকলে)
+১  DB + Apps
+২  MFG Settings সব ☐ Save (মিনিমাল)
+৩  Product তিনটা
+৪  Receipt কাঁচামাল
+৫  BOM
+৬  MO → Done
 ```
-
-রহিম: “কত Combo বানালাম, কাঁচামাল কত কমল — সব খাতায় আছে।”
-
----
-
-# কে কখন কোন মেনু
-
-| মেনু | রহিম | রফিক | জাবেদ |
-|---|---|---|---|
-| Apps / Settings / BOM | ✅ একবার | — | — |
-| Products (কাঁচামাল/তৈরি) | ✅ | দেখে | On Hand |
-| Receipts | — | — | ✅ কাঁচামাল |
-| Manufacturing Orders | দেখে | ✅ Confirm + Produce | — |
-| Sales (তৈরি পণ্য) | — | — | Delivery |
-
----
-
-# ডেমো চরিত্র ও পণ্য — এক নজরে
-
-| নাম | ধরন |
-|---|---|
-| Dhaka Electronics Ltd | Vendor |
-| USB Cable 1m | কাঁচামাল |
-| Plastic Case | কাঁচামাল |
-| Charger Combo Pack | তৈরি পণ্য |
-| BOM | 1 Pack = 1 Cable + 1 Case |
-| MO Qty | 10 |
-
----
-
-# এক নজরে পুরো রাস্তা
-
-```
-১  DB + Company (Demo OFF)
-২  Contacts + Inventory + Manufacturing Install
-৩  Vendor লেখা
-৪  Product: Cable, Case, Combo Pack
-৫  Receipt: Cable 100 + Case 100 → Validate
-৬  BOM: Combo = Cable 1 + Case 1
-৭  MO: Combo Qty 10 → Confirm → Check Availability
-৮  Produce / Done
-৯  On Hand: Combo +10, কাঁচামাল −10 করে
-১০ (ঐচ্ছিক) Sales এ Combo বিক্রি
-```
-
----
-
-## সমস্যা হলে
-
-| সমস্যা | কী করবেন |
-|---|---|
-| Manufacturing মেনু নেই | Apps → Install |
-| BOM এ Product খালি | আগে Product Save |
-| Components খালি | BOM এ লাইন যোগ |
-| Cannot produce / স্টক নেই | আগে Receipt দিয়ে কাঁচামাল আনুন |
-| Combo On Hand ০ অথচ Done | Product Type Storable তো? Location Internal তো? |
-| Work Orders জটিল | Settings এ Work Orders টিক খুলে সাধারণ Produce করুন |
-
----
-
-## Accounting এর মতো মনে রাখুন
-
-```
-Accounting: Account আগে → Product এ সেট
-Manufacturing: Product + স্টক আগে → BOM → তারপর MO
-কোনো কিছু না বানিয়ে সামনের ধাপে যাবেন না
-```
-
-এই ফাইল উপর থেকে দিন ১ → ৫।  
-রহিম সেটআপ, জাবেদ কাঁচামাল, রফিক তৈরি — তাহলে Manufacturing পরিষ্কার।

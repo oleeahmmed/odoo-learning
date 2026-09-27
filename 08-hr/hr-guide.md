@@ -1,157 +1,109 @@
-# HR — সহজ গল্পে সম্পূর্ণ সেটআপ
-### রহিম ট্রেডার্স: scratch থেকে Login → কর্মী খাতা
+# HR — scratch থেকে সম্পূর্ণ সেটআপ
+### রহিম ট্রেডার্স: Login → Install → Settings → Configuration → Employees
 
 ---
 
-## গল্প: অফিসে কে কে?
+## কে কে?
 
-| কে | ভূমিকা | Odoo তে কী |
-|---|---|---|
-| **রহিম ভাই** | মালিক | Employee সেটআপ, অনুমোদন |
-| **সালমা** | Sales | Employee রেকর্ড |
-| **জাবেদ** | Store | Employee রেকর্ড |
-| **রফিক** | Production | Employee রেকর্ড |
-| **করিম** | Accounts | Employee রেকর্ড |
-| **নাজমা** | HR সহায়ক | নতুন কর্মী এন্ট্রি, ছুটি দেখে |
-
-রহিম: “কর্মীদের নাম ফোনে আর কাগজে নয় — Odoo তে এক খাতা।”
-
-```
-Demo data ☐ OFF
-অ্যাপ = Employees (HR বেসিক)
-DB: rahim_hr অথবা rahim_full_erp এ Employees Install
-Community তে Payroll/Attendance পূর্ণাঙ্গ নাও থাকতে পারে — বেসিক Employeeই যথেষ্ট
-```
-
----
-
-## সোনার নিয়ম
-
-```
-১  আগে Department/Job (ঐচ্ছিক) → তারপর Employee
-২  Employee ≠ Contacts Customer — কর্মী আলাদা খাতা
-৩  User লগইন আলাদা — Employee কার্ড শুধু তথ্য হতে পারে
-৪  ছুটি/অ্যাটেনডেন্স অ্যাপ আলাদা Install লাগতে পারে
-```
-
----
-
-# দিন ১ — Database + Apps (রহিম)
-
-```
-http://localhost:8069/web/database/manager
-```
-
-| Field | মান |
+| কে | কাজ |
 |---|---|
-| Database Name | `rahim_hr` |
-| Email | `admin@rahim.com` |
-| Password | `admin123` |
-| Country | Bangladesh |
-| Demo data | ☐ খালি |
+| **রহিম** | Settings / Approve |
+| **নাজমা** | Employee New |
+| ডেমো কর্মী | সালমা, জাবেদ, রফিক, করিম |
 
-Company: রহিম ট্রেডার্স → Timezone Asia/Dhaka
+```
+Demo ☐ OFF | DB: rahim_hr
+Apps: Employees (+ Contacts)
+Time Off আলাদা অ্যাপ থাকলে ঐচ্ছিক Install
+```
+
+---
+
+# দিন ১ — Scratch Login + Install
+
+| Database | `rahim_hr` | Demo ☐ |
+| admin@rahim.com / admin123 | BD |
+
+Company রহিম ট্রেডার্স + Timezone
 
 ```
 Apps → Employees → Install
 Apps → Contacts → Install
 ```
 
-চাইলে: Time Off (ছুটি) আলাদা অ্যাপ থাকলে Install।
+মেনু:
 
-উপরে **Employees** মেনু OK।
+```
+Employees | Department | Reporting | Configuration
+```
+
+(নাম ভার্সন অনুযায়ী একটু ভিন্ন হতে পারে।)
 
 ---
 
-# দিন ১ বিকেল — Department ও Job (রহিম)
+# দিন ১ — Employees Settings (রহিম) মিনিমাল
 
 ```
-Employees → Configuration → Departments → New
+Employees → Configuration → Settings
 ```
+অথবা Settings → Employees
 
-| Name |
-|---|
-| Sales |
-| Warehouse |
-| Production |
-| Accounts |
+| অপশন | মিনিমাল | কী হয় |
+|---|---|---|
+| Presence icons / Presence | ☑ ডিফল্ট | অনলাইন উপস্থিতি আইকন |
+| Skills Management | ☐ | স্কিল ট্যাব |
+| Employee Editing | ডিফল্ট | কে এডিট করতে পারে |
+| Advanced Presence | ☐ | জটিল প্রেজেন্স |
 
-```
-Configuration → Job Positions → New
-```
+**মিনিমাল:** ডিফল্ট রেখে **Save** — বেশি টিক নয়।
 
-| Job | Department |
+Time Off অ্যাপ Install করলে আলাদা Settings: Leave types — পরে।
+
+---
+
+# দিন ১ — Configuration মেনু ধরে
+
+| মেনু | কী করবেন |
 |---|---|
-| Sales Executive | Sales |
-| Store Keeper | Warehouse |
-| Production Staff | Production |
-| Accountant | Accounts |
+| Settings | মিনিমাল Save |
+| Departments | New: Sales, Warehouse, Production, Accounts |
+| Job Positions | Sales Executive, Store Keeper, Production Staff, Accountant |
+| Work Locations | ঐচ্ছিক: Head Office Dhaka |
+| Employment Types | ডিফল্ট (Employee) |
+| Skills / Resume | Skills টিক না থাকলে স্কিপ |
+| Departure Reasons | ডিফল্ট |
+
+**মিনিমাল সিরিয়াল:** আগে Department → Job → তারপর Employee।
+
+---
+
+# দিন ২ — Employees মেনু
+
+New করে চারজন:
+
+| Name | Job | Department | Work Email |
+|---|---|---|---|
+| সালমা | Sales Executive | Sales | salma@rahim.demo |
+| জাবেদ | Store Keeper | Warehouse | javed@rahim.demo |
+| রফিক | Production Staff | Production | rafiq@rahim.demo |
+| করিম | Accountant | Accounts | karim@rahim.demo |
 
 → Save
 
-**নাজমা পরে কী দেখবে:** Employee ফর্মে এই Department/Job বাছা যায়।
+Department মেনু = বিভাগ অনুযায়ী কার্ড।
 
 ---
 
-# দিন ২ — কর্মী এন্ট্রি (নাজমা)
+# দিন ৩ — User (ঐচ্ছিক)
 
-```
-Employees → New
-```
-
-ডেমো চারজন:
-
-| Name | Job | Department | Work Email | Work Mobile |
-|---|---|---|---|---|
-| সালমা | Sales Executive | Sales | salma@rahim.demo | 01720000001 |
-| জাবেদ | Store Keeper | Warehouse | javed@rahim.demo | 01720000002 |
-| রফিক | Production Staff | Production | rafiq@rahim.demo | 01720000003 |
-| করিম | Accountant | Accounts | karim@rahim.demo | 01720000004 |
-
-প্রতিজন → **Save**
-
-**রহিম কী দেখবে:** Employees কানবান/লিস্টে চারটা কার্ড।
-
-```
-এখন শুধু খাতা — বেতন স্লিপ Community তে সীমিত হতে পারে
-Full ERP তে এই নামগুলোই দলের চরিত্র
-```
+Settings → Users → সালমাকে Sales অধিকার।  
+Employee এ Related User লিংক।
 
 ---
 
-# দিন ৩ — User লগইন (ঐচ্ছিক) (রহিম)
+# Reporting
 
-কর্মীকে নিজে লগইন করতে দিলে:
-
-```
-Settings → Users → New
-```
-
-সালমার ইমেইল দিয়ে User → Sales অধিকার।  
-Employee ফর্মে Related User লিংক (থাকলে)।
-
-শিখতে Admin দিয়েই সব মডিউল চালানো যায় — User পরে।
-
----
-
-# দিন ৪ — Time Off (ছুটি) থাকলে
-
-Time Off অ্যাপ Install থাকলে:
-
-জাবেদ → ছুটির আবেদন → রহিম Approve/Refuse।
-
-না থাকলে স্কিপ — শুধু Employee মাস্টারই Full ERP এর জন্য যথেষ্ট।
-
----
-
-# কে কখন কোন মেনু
-
-| মেনু | রহিম | নাজমা |
-|---|---|---|
-| Departments / Jobs | ✅ একবার | — |
-| Employees New | চেক | ✅ রোজ নতুন কর্মী |
-| Users | ✅ | — |
-| Time Off | Approve | আবেদন দেখে |
+Employee ফিল্টার/পিভট — ডাটা থাকলে।
 
 ---
 
@@ -159,18 +111,7 @@ Time Off অ্যাপ Install থাকলে:
 
 ```
 ১  DB + Employees Install
-২  Department + Job
-৩  Employee: সালমা, জাবেদ, রফিক, করিম
-৪  (ঐচ্ছিক) User লিংক
-৫  Full ERP গাইডে এই দল দিয়ে কাজ
+২  Settings মিনিমাল Save
+৩  Departments → Jobs
+৪  Employees ৪ জন
 ```
-
-## সমস্যা হলে
-
-| সমস্যা | করণীয় |
-|---|---|
-| Employees মেনু নেই | Apps → Install |
-| Job খালি | আগে Job Positions Save |
-| Payroll নেই | Community সীমা — Enterprise/অ্যাডঅন |
-
-পরের পার্ট **Full ERP**: এই কর্মীদের নিয়ে সব মডিউল এক খাতায়।
