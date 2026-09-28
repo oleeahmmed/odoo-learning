@@ -161,3 +161,12 @@ Service দিই
 
 সব পার্ট ক্রমানুসারে করলে সবচেয়ে ভালো।
 কিন্তু শুধু Inventory দরকার হলে `02-inventory` থেকেই শুরু করতে পারেন।
+
+
+cd C:\odoo-dev
+
+.\odoo17-venv\Scripts\Activate.ps1
+
+python odoo17\odoo-bin -c odoo17.conf
+
+চালু হলে ব্রাউজার: http://localhost:8069
